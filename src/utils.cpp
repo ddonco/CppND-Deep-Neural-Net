@@ -67,14 +67,18 @@ ActivationFunctionType Config::getActivationFunction(std::string value)
 
 void Config::printConfig()
 {
+    std::map<LayerType, std::string> mapLayerType;
+    mapLayerType[LayerType::dense] = "DenseLayer";
+
     for (int l = 0; l < layers.size(); l++)
     {
-        std::cout << "Layer Type: " << layers[l] << std::endl;
+        std::cout << "Layer Type:\n    " << mapLayerType[layers[l]] << std::endl;
+
         std::cout << "Layer Properties:" << std::endl;
 
         for (int p = 0; p < layerProperties[l].size(); p++)
         {
-            std::cout << layerProperties[l][p] << std::endl;
+            std::cout << "    " << layerProperties[l][p] << std::endl;
         }
         std::cout << std::endl;
     }
