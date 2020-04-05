@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "model.h"
 
 int main()
 {
@@ -6,7 +7,10 @@ int main()
 
     Config networkConfig;
     networkConfig.readConfig(configPath);
-    networkConfig.printConfig();
+    // networkConfig.printConfig();
+
+    Model model = Model(networkConfig);
+    model.printModel();
 
     return 0;
 }

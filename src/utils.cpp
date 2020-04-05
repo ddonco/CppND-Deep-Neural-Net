@@ -24,7 +24,7 @@ void Config::readConfig(std::string configPath)
             }
             else
             {
-                std::vector<std::string> props = getProperties(value);
+                std::vector<std::string> props = Utils::parseProperties(value);
                 propertiesMap[props[0]] = props[1];
             }
         }
@@ -47,37 +47,39 @@ LayerType Config::getLayer(std::string value)
     }
 }
 
-std::vector<std::string> Config::getProperties(std::string value)
+std::vector<std::string> Utils::parseProperties(std::string value)
 {
     value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
-    return splitString(value, '=');
+    return Utils::splitString(value, '=');
 }
 
-ActivationFunctionType Config::getActivationFunction(std::string value)
+ActivationFunctionType Utils::parseActivationFunction(std::string value)
 {
     try
     {
-        value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
-        std::vector<std::string> splitValue = splitString(value, '=');
-        if (splitValue[1] == "relu")
+        if (value.compare("relu") == 0)
+        {
             return ActivationFunctionType::relu;
-        else if (splitValue[1] == "sigmoid")
+        }
+        else if (value.compare("softmax") == 0)
+        {
             return ActivationFunctionType::softmax;
+        }
         else
             throw "Unrecoknized activation function: " + value;
     }
     catch (std::string e)
     {
-        std::cout << e << std::endl;
+        std::cerr << e << std::endl;
     }
 }
 
-int Config::getInputsOutputs(std::string value)
+int Utils::parseInputsOutputs(std::string value)
 {
     try
     {
         value.erase(std::remove(value.begin(), value.end(), ' '), value.end());
-        std::vector<std::string> splitValue = splitString(value, '=');
+        std::vector<std::string> splitValue = Utils::splitString(value, '=');
         return std::stoi(splitValue[1]);
     }
     catch (const std::exception &ex)
@@ -98,17 +100,15 @@ void Config::printConfig()
         std::cout << "Layer Properties:" << std::endl;
 
         std::map<std::string, std::string> properties = layerProperties[l];
-        std::map<std::string, std::string>::iterator it = properties.begin();
-        while (it != properties.end())
+        for (auto const &[key, value] : properties)
         {
-            std::cout << "    " << it->first << " = " << it->second << std::endl;
-            it++;
+            std::cout << "    " << key << " = " << value << std::endl;
         }
         std::cout << std::endl;
     }
 }
 
-std::vector<std::string> Config::splitString(const std::string &s, char delimiter)
+std::vector<std::string> Utils::splitString(const std::string &s, char delimiter)
 {
     std::string token;
     std::vector<std::string> tokens;
