@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,7 @@ enum LayerType
 class Layer
 {
 public:
+    Layer();
     Layer(int inputs, int outputs, ActivationFunctionType activation);
     void setRequiredProperties(std::map<std::string, std::string> properties);
 
@@ -28,13 +30,14 @@ protected:
     bool _inputsSet{false};
     bool _outputsSet{false};
     bool _actiationSet{false};
-    std::vector<std::vector<float>> _weights;
-    float _bias{0};
+    std::unique_ptr<std::vector<std::vector<float>>> _weights;
+    std::unique_ptr<float> _bias;
 };
 
 class DenseLayer : public Layer
 {
 public:
+    DenseLayer();
     DenseLayer(int inputs, int outputs, ActivationFunctionType activation, float dropout);
     void printLayer();
 

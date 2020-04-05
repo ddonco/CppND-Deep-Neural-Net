@@ -1,6 +1,8 @@
 #include "layer.h"
 #include "utils.h"
 
+Layer::Layer() {}
+
 Layer::Layer(int inputs, int outputs, ActivationFunctionType activation)
 	: _inputs(inputs), _outputs(outputs), _activation(activation)
 {
@@ -48,6 +50,8 @@ void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
 		std::cout << e << std::endl;
 	}
 }
+
+DenseLayer::DenseLayer() {}
 
 DenseLayer::DenseLayer(int inputs, int outputs, ActivationFunctionType activation, float dropout = 0.0)
 	: Layer(inputs, outputs, activation), _dropoutRate(dropout)
