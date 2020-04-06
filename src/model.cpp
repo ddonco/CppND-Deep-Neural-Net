@@ -5,6 +5,8 @@
 
 Model::Model(Config config)
 {
+    // Build model by iterating over config layers and instantiating layer objects
+    // and adding them to the layers memeber.
     for (int i = 0; i < config.layers.size(); i++)
     {
         LayerType layerType = config.layers[i];
