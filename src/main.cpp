@@ -12,5 +12,7 @@ int main()
     Model model = Model(networkConfig);
     model.printModel();
 
+    model.testForwardPass();
+
     return 0;
 }

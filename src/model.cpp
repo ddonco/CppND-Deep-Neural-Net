@@ -59,3 +59,21 @@ void Model::printModel()
         }
     }
 }
+
+void Model::testForwardPass()
+{
+    std::cout << "*** Forward Pass Test ***" << std::endl;
+
+    Eigen::MatrixXf m = Eigen::MatrixXf::Constant(1, 4, 1);
+    // std::cout << "Input matrix:\n"
+    //           << m << std::endl;
+    auto &layer = _layers[0];
+
+    if (auto value = std::get_if<DenseLayer>(&layer))
+    {
+        DenseLayer &v = *value;
+        Eigen::MatrixXf o = v.forwardPass(m);
+        std::cout << "Output matrix:\n"
+                  << o << std::endl;
+    }
+}

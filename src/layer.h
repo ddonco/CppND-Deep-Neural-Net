@@ -21,6 +21,7 @@ public:
     Layer();
     Layer(int inputs, int outputs, ActivationFunctionType activation);
     void setRequiredProperties(std::map<std::string, std::string> properties);
+    Eigen::MatrixXf forwardPass(Eigen::MatrixXf &input);
 
     std::vector<std::string> propertiesRequired{"inputs", "outputs", "activation"};
 
@@ -31,7 +32,7 @@ protected:
     bool _inputsSet{false};
     bool _outputsSet{false};
     bool _actiationSet{false};
-    std::unique_ptr<std::vector<std::vector<float>>> _weights;
+    std::unique_ptr<Eigen::MatrixXf> _weights;
     std::unique_ptr<float> _bias;
 };
 

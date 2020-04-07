@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <variant>
+#include <Eigen/Dense>
+
 #include "utils.h"
 
 // struct ModelLayer
@@ -16,8 +18,12 @@ class Model
 public:
     Model(Config config);
     void printModel();
-    void train();
-    void predict();
+    void trainSingle();
+    void trainBatch();
+    void predictSingle();
+    void predictBatch();
+
+    void testForwardPass();
 
 private:
     // Vector of pointers to neural network layers.
