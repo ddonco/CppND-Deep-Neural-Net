@@ -12,4 +12,13 @@ project(DNN)
 # Find all executables
 file(GLOB project_SRCS src/*.cpp) #src/*.h
 
+# Find Eigen
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+message("${CMAKE_CURRENT_LIST_DIR}")
+message("${CMAKE_MODULE_PATH}")
+message("${EIGEN3_INCLUDE_DIR}")
+
 add_executable(DNN ${project_SRCS})
