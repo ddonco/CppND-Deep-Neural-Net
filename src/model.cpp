@@ -5,6 +5,7 @@
 
 Model::Model(Config config)
 {
+    batchSize = 1;
     for (int i = 0; i < config.layers.size(); i++)
     {
         LayerType layerType = config.layers[i];
@@ -33,6 +34,7 @@ Model::Model(Config config)
 
                 _layers.emplace_back(DenseLayer(std::stoi(properties["inputs"]),
                                                 std::stoi(properties["outputs"]),
+                                                batchSize,
                                                 actFunction,
                                                 dropout));
                 break;
@@ -67,7 +69,7 @@ void Model::testForwardPass()
     Eigen::MatrixXf m = Eigen::MatrixXf::Constant(1, 4, 1);
     // std::cout << "Input matrix:\n"
     //           << m << std::endl;
-    auto &layer = _layers[0];
+    auto &layer = _layers[1];
 
     if (auto value = std::get_if<DenseLayer>(&layer))
     {

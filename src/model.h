@@ -25,6 +25,8 @@ public:
 
     void testForwardPass();
 
+    int batchSize{1};
+
 private:
     // Vector of pointers to neural network layers.
     // Layers can be of multiple layer types, currently only includes DenseLayer

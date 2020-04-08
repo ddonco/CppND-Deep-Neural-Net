@@ -19,12 +19,13 @@ class Layer
 {
 public:
     Layer();
-    Layer(int inputs, int outputs, ActivationFunctionType activation);
+    Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation);
     void setRequiredProperties(std::map<std::string, std::string> properties);
     void forward(Eigen::MatrixXf &m);
     void backward(Eigen::MatrixXf &m);
 
     std::vector<std::string> propertiesRequired{"inputs", "outputs", "activation"};
+    int batchSize;
 
 protected:
     int _inputs;
@@ -46,7 +47,7 @@ class DenseLayer : public Layer
 {
 public:
     DenseLayer();
-    DenseLayer(int inputs, int outputs, ActivationFunctionType activation, float dropout);
+    DenseLayer(int inputs, int outputs, int batchSize, ActivationFunctionType activation, float dropout);
     void printLayer();
 
     LayerType type{LayerType::dense};
