@@ -21,7 +21,8 @@ public:
     Layer();
     Layer(int inputs, int outputs, ActivationFunctionType activation);
     void setRequiredProperties(std::map<std::string, std::string> properties);
-    Eigen::MatrixXf forwardPass(Eigen::MatrixXf &input);
+    void forward(Eigen::MatrixXf &m);
+    void backward(Eigen::MatrixXf &m);
 
     std::vector<std::string> propertiesRequired{"inputs", "outputs", "activation"};
 
@@ -32,8 +33,13 @@ protected:
     bool _inputsSet{false};
     bool _outputsSet{false};
     bool _actiationSet{false};
+    std::unique_ptr<Eigen::MatrixXf> _input;
+    std::unique_ptr<Eigen::MatrixXf> _output;
     std::unique_ptr<Eigen::MatrixXf> _weights;
-    std::unique_ptr<float> _bias;
+    std::unique_ptr<Eigen::MatrixXf> _weightsDelta;
+    std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;
+    std::unique_ptr<Eigen::MatrixXf> _bias;
+    std::unique_ptr<Eigen::MatrixXf> _biasDelta;
 };
 
 class DenseLayer : public Layer

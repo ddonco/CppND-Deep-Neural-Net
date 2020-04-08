@@ -72,8 +72,6 @@ void Model::testForwardPass()
     if (auto value = std::get_if<DenseLayer>(&layer))
     {
         DenseLayer &v = *value;
-        Eigen::MatrixXf o = v.forwardPass(m);
-        std::cout << "Output matrix:\n"
-                  << o << std::endl;
+        v.forward(m);
     }
 }

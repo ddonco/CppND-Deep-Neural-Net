@@ -6,9 +6,13 @@ Layer::Layer() {}
 Layer::Layer(int inputs, int outputs, ActivationFunctionType activation)
 	: _inputs(inputs), _outputs(outputs), _activation(activation)
 {
-	// _weights = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Random(outputs, inputs));
+	_input = std::make_unique<Eigen::MatrixXf>();
+	_output = std::make_unique<Eigen::MatrixXf>();
 	_weights = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Random(outputs, inputs));
-	_bias = std::make_unique<float>(0);
+	_weightsDelta = std::make_unique<Eigen::MatrixXf>();
+	_backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
+	_bias = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(1, 1));
+	_biasDelta = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(1, 1));
 }
 
 void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
@@ -54,17 +58,35 @@ void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
 	}
 }
 
-Eigen::MatrixXf Layer::forwardPass(Eigen::MatrixXf &input)
+void Layer::forward(Eigen::MatrixXf &m)
 {
 	std::cout << "Input matrix:\n"
-			  << input << std::endl;
+			  << m << std::endl;
 	std::cout << "Weight matrix:\n"
-			  << *(this->_weights) << std::endl;
-	Eigen::MatrixXf output = (input * (*(this->_weights)).transpose()).array() + *(this->_bias);
-	return output;
+			  << *_weights << std::endl;
+	*_input = m;
+	// TODO: adding bias as a matrix to a matrix of different dimension not working
+	*_output = (m * (*_weights).transpose()).colwise() + (*_bias).array();
+	std::cout << "Weight matrix after transpose:\n"
+			  << *_weights << std::endl;
+	std::cout << "Output matrix:\n"
+			  << *_output << std::endl;
 }
 
-DenseLayer::DenseLayer() {}
+void Layer::backward(Eigen::MatrixXf &m)
+{
+	// Calculate gradient of the weights
+	*_weightsDelta = (*_input).transpose() * m;
+
+	*_biasDelta = (*_backpassDeltaValues).rowwise().sum();
+
+	// Calculate gradient of the backward pass values
+	*_backpassDeltaValues = m * (*_weights).transpose();
+}
+
+DenseLayer::DenseLayer()
+{
+}
 
 DenseLayer::DenseLayer(int inputs, int outputs, ActivationFunctionType activation, float dropout = 0.0)
 	: Layer(inputs, outputs, activation), _dropoutRate(dropout)
@@ -80,9 +102,9 @@ void DenseLayer::printLayer()
 
 	std::cout << "Layer Type:\n    Dense Layer" << std::endl;
 	std::cout << "Layer Properties:"
-			  << "\n    Inputs: " << this->_inputs
-			  << "\n    Outputs: " << this->_outputs
-			  << "\n    Activation: " << mapActivationType[this->_activation]
+			  << "\n    Inputs: " << _inputs
+			  << "\n    Outputs: " << _outputs
+			  << "\n    Activation: " << mapActivationType[_activation]
 			  << "\n    Weights:\n"
 			  << (*_weights).format(CleanFmt)
 			  << "\n    Bias: " << *_bias
