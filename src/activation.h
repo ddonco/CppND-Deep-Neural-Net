@@ -14,10 +14,12 @@ class Relu
 {
 public:
     void forward(Eigen::MatrixXf &m);
-    void backward();
+    void backward(Eigen::MatrixXf &m);
 
 private:
     std::unique_ptr<Eigen::MatrixXf> _input;
+    std::unique_ptr<Eigen::MatrixXf> _output;
+    std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;
 };
 
 class Softmax
