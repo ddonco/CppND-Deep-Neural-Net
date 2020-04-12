@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 #include <Eigen/Dense>
 
@@ -18,7 +19,6 @@ enum LayerType
 class Layer
 {
 public:
-    Layer();
     Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation);
     void setRequiredProperties(std::map<std::string, std::string> properties);
     void forward(Eigen::MatrixXf &m);
@@ -27,10 +27,11 @@ public:
     std::vector<std::string> propertiesRequired{"inputs", "outputs", "activation"};
     int batchSize;
 
-protected:
+    // protected:
     int _inputs;
     int _outputs;
     ActivationFunctionType _activation;
+    std::variant<Relu, Softmax> _activationFunction;
     bool _inputsSet{false};
     bool _outputsSet{false};
     bool _actiationSet{false};
@@ -46,7 +47,6 @@ protected:
 class DenseLayer : public Layer
 {
 public:
-    DenseLayer();
     DenseLayer(int inputs, int outputs, int batchSize, ActivationFunctionType activation, float dropout);
     void printLayer();
 

@@ -1,8 +1,6 @@
 #include "layer.h"
-#include "utils.h"
 #include "model.h"
-
-Layer::Layer() {}
+#include "utils.h"
 
 Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation)
 	: _inputs(inputs), _outputs(outputs), batchSize(batchSize), _activation(activation)
@@ -14,6 +12,20 @@ Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType acti
 	_backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
 	_bias = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
 	_biasDelta = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
+
+	switch (activation)
+	{
+	case ActivationFunctionType::relu:
+		_activationFunction = Relu();
+		break;
+
+	case ActivationFunctionType::softmax:
+		_activationFunction = Softmax();
+		break;
+
+	default:
+		break;
+	}
 }
 
 void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
@@ -75,6 +87,12 @@ void Layer::forward(Eigen::MatrixXf &m)
 			  << *_weights << std::endl;
 	std::cout << "Output matrix:\n"
 			  << *_output << std::endl;
+
+	if (auto value = std::get_if<Relu>(&_activationFunction))
+	{
+		Relu &v = *value;
+		v.forward(*_output);
+	}
 }
 
 void Layer::backward(Eigen::MatrixXf &m)
@@ -82,14 +100,10 @@ void Layer::backward(Eigen::MatrixXf &m)
 	// Calculate gradient of the weights
 	*_weightsDelta = (*_input).transpose() * m;
 
-	*_biasDelta = (*_backpassDeltaValues).rowwise().sum();
+	*_biasDelta = (*_backpassDeltaValues).colwise().sum();
 
 	// Calculate gradient of the backward pass values
 	*_backpassDeltaValues = m * (*_weights).transpose();
-}
-
-DenseLayer::DenseLayer()
-{
 }
 
 DenseLayer::DenseLayer(int inputs, int outputs, int batchSize, ActivationFunctionType activation, float dropout = 0.0)

@@ -69,11 +69,17 @@ void Model::testForwardPass()
     Eigen::MatrixXf m = Eigen::MatrixXf::Constant(1, 4, 1);
     // std::cout << "Input matrix:\n"
     //           << m << std::endl;
-    auto &layer = _layers[1];
+    // auto &layer = _layers[0];
 
-    if (auto value = std::get_if<DenseLayer>(&layer))
+    for (auto &layer : _layers)
     {
-        DenseLayer &v = *value;
-        v.forward(m);
+        if (auto value = std::get_if<DenseLayer>(&layer))
+        {
+            DenseLayer &v = *value;
+            v.forward(m);
+            m = *(v._output);
+        }
     }
+
+    _loss.forward();
 }

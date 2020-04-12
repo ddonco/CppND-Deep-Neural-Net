@@ -5,6 +5,7 @@
 #include <variant>
 #include <Eigen/Dense>
 
+#include "loss.h"
 #include "utils.h"
 
 // struct ModelLayer
@@ -33,6 +34,7 @@ private:
     // std::vector<std::unique_ptr<std::variant<DenseLayer>>> _layers;
     // std::vector<ModelLayer> _layers;
     std::vector<std::variant<DenseLayer>> _layers;
+    CategoricalCrossEntropy _loss;
 };
 
 #endif
