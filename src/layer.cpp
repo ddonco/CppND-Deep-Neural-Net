@@ -13,19 +13,19 @@ Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType acti
 	_bias = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
 	_biasDelta = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
 
-	switch (activation)
-	{
-	case ActivationFunctionType::relu:
-		_activationFunction = Relu();
-		break;
+	// switch (activation)
+	// {
+	// case ActivationFunctionType::relu:
+	// 	_activationFunction = Relu();
+	// 	break;
 
-	case ActivationFunctionType::softmax:
-		_activationFunction = Softmax();
-		break;
+	// case ActivationFunctionType::softmax:
+	// 	_activationFunction = Softmax();
+	// 	break;
 
-	default:
-		break;
-	}
+	// default:
+	// 	break;
+	// }
 }
 
 void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
@@ -87,12 +87,6 @@ void Layer::forward(Eigen::MatrixXf &m)
 			  << *_weights << std::endl;
 	std::cout << "Output matrix:\n"
 			  << *_output << std::endl;
-
-	if (auto value = std::get_if<Relu>(&_activationFunction))
-	{
-		Relu &v = *value;
-		v.forward(*_output);
-	}
 }
 
 void Layer::backward(Eigen::MatrixXf &m)

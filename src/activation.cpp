@@ -27,7 +27,8 @@ void Relu::forward(Eigen::MatrixXf &m)
         }
     }
     std::cout << "Relu output matrix:\n"
-              << *_output << std::endl;
+              << *_output << "\n"
+              << std::endl;
 }
 
 void Relu::backward(Eigen::MatrixXf &m)

@@ -9,20 +9,21 @@ float CategoricalCrossEntropy::forward(Eigen::MatrixXf yPred, Eigen::MatrixXf yT
 {
     // number of training samples
     int numSamples = yPred.rows();
-
     // For categorical labels, calculate probabilities
     if (yTrue.cols() == 1)
     {
-        Eigen::MatrixXf yPredLargest = Eigen::MatrixXf::Zero(numSamples, 1);
+        Eigen::MatrixXf yPredArray = Eigen::MatrixXf::Zero(numSamples, 1);
         for (int r = 0; r < numSamples; r++)
         {
-            // yPredLargest(r, 1) = yPred(r, yTrue(r));
+            int yTrueCat = yTrue(r, Eigen::all).maxCoeff();
+            yPredArray(r, 0) = yPred(r, yTrueCat);
         }
+        yPred = yPredArray;
     }
 
     // Calculate losses
     Eigen::MatrixXf negLogLikelihoods = yPred.array().log();
-    // negLogLikelihoods = negLogLikelihoods * -1;
+    negLogLikelihoods = negLogLikelihoods * -1;
 
     // For on-hot-encoded labels, mask labels with likelihoods
     if (yTrue.cols() == 2)

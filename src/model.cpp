@@ -6,6 +6,7 @@
 Model::Model(Config config)
 {
     batchSize = 1;
+    ActivationFunctionType actFunction;
     for (int i = 0; i < config.layers.size(); i++)
     {
         LayerType layerType = config.layers[i];
@@ -17,7 +18,7 @@ Model::Model(Config config)
             {
                 std::map<std::string, std::string> properties = config.layerProperties[i];
 
-                ActivationFunctionType actFunction = Utils::parseActivationFunction(properties["activation"]);
+                actFunction = Utils::parseActivationFunction(properties["activation"]);
 
                 float dropout = 0.0;
                 if (properties.count("dropout"))
@@ -47,14 +48,28 @@ Model::Model(Config config)
         default:
             break;
         }
+
+        switch (actFunction)
+        {
+        case ActivationFunctionType::relu:
+            _activationLayers.emplace_back(Relu());
+            break;
+
+        case ActivationFunctionType::softmax:
+            _activationLayers.emplace_back(Softmax());
+
+        default:
+            break;
+        }
     }
 }
 
 void Model::printModel()
 {
-    for (auto &layer : _layers)
+    // for (auto &layer : _layers)
+    for (int l = 0; l < _layers.size(); l++)
     {
-        if (auto value = std::get_if<DenseLayer>(&layer))
+        if (auto value = std::get_if<DenseLayer>(&(_layers[l])))
         {
             DenseLayer &v = *value;
             v.printLayer();
@@ -66,20 +81,37 @@ void Model::testForwardPass()
 {
     std::cout << "*** Forward Pass Test ***" << std::endl;
 
-    Eigen::MatrixXf m = Eigen::MatrixXf::Constant(1, 4, 1);
-    // std::cout << "Input matrix:\n"
-    //           << m << std::endl;
+    Eigen::MatrixXf layerOut = Eigen::MatrixXf::Constant(1, 4, 1);
+    Eigen::MatrixXf ypred = Eigen::MatrixXf::Constant(1, 1, 1);
+    Eigen::MatrixXf ytrue = Eigen::MatrixXf::Constant(1, 1, 2);
+    // Eigen::MatrixXf layerOut;
+
     // auto &layer = _layers[0];
 
-    for (auto &layer : _layers)
+    for (int i = 0; i < _layers.size(); i++)
     {
-        if (auto value = std::get_if<DenseLayer>(&layer))
+        if (auto l = std::get_if<DenseLayer>(&(_layers[i])))
         {
-            DenseLayer &v = *value;
-            v.forward(m);
-            m = *(v._output);
+            DenseLayer &layer = *l;
+            layer.forward(layerOut);
+            layerOut = *(layer._output);
+        }
+
+        if (auto a = std::get_if<Relu>(&(_activationLayers[i])))
+        {
+            Relu &activation = *a;
+            activation.forward(layerOut);
+            layerOut = *(activation._output);
+        }
+        else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
+        {
+            Softmax &activation = *a;
+            activation.forward(layerOut);
+            layerOut = *(activation._output);
         }
     }
 
-    _loss.forward();
+    float lossValue = _loss.forward(layerOut, ytrue);
+    std::cout << "Loss value: " << lossValue << "\n"
+              << std::endl;
 }

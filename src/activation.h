@@ -18,7 +18,7 @@ public:
     void forward(Eigen::MatrixXf &m);
     void backward(Eigen::MatrixXf &m);
 
-protected:
+    // protected:
     std::unique_ptr<Eigen::MatrixXf> _input;
     std::unique_ptr<Eigen::MatrixXf> _output;
     std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;
@@ -31,7 +31,7 @@ public:
     void forward(Eigen::MatrixXf &m);
     void backward(Eigen::MatrixXf &m);
 
-private:
+    // private:
     std::unique_ptr<Eigen::MatrixXf> _input;
     std::unique_ptr<Eigen::MatrixXf> _output;
     std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;

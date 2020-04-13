@@ -31,7 +31,7 @@ public:
     int _inputs;
     int _outputs;
     ActivationFunctionType _activation;
-    std::variant<Relu, Softmax> _activationFunction;
+    std::unique_ptr<std::variant<Relu, Softmax>> _activationFunction;
     bool _inputsSet{false};
     bool _outputsSet{false};
     bool _actiationSet{false};

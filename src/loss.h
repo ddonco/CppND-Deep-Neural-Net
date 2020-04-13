@@ -2,6 +2,7 @@
 #define LOSS_H
 
 #include <memory>
+#include <iostream>
 #include <Eigen/Dense>
 
 class Loss
