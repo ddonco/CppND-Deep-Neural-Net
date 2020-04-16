@@ -81,8 +81,8 @@ void Model::testForwardPass()
 {
     std::cout << "*** Forward Pass Test ***" << std::endl;
 
-    Eigen::MatrixXf layerOut = Eigen::MatrixXf::Constant(1, 4, 1);
-    Eigen::MatrixXf ypred = Eigen::MatrixXf::Constant(1, 1, 1);
+    Eigen::MatrixXf layerOut = Eigen::MatrixXf::Constant(1, 4, 2);
+    Eigen::MatrixXf ypred = Eigen::MatrixXf::Constant(1, 1, 2);
     Eigen::MatrixXf ytrue = Eigen::MatrixXf::Constant(1, 1, 2);
     // Eigen::MatrixXf layerOut;
 
@@ -113,5 +113,23 @@ void Model::testForwardPass()
 
     float lossValue = _loss.forward(layerOut, ytrue);
     std::cout << "Loss value: " << lossValue << "\n"
+              << std::endl;
+
+    Eigen::VectorXf predictionScores = layerOut.rowwise().maxCoeff();
+    Eigen::VectorXf predictionCategories = Eigen::VectorXf(predictionScores);
+    Eigen::MatrixXf::Index maxIndex;
+    for (int i = 0; i < predictionScores.size(); i++)
+    {
+        for (int cat = 0; cat < layerOut.cols(); cat++)
+        {
+            if (layerOut(i, cat) == predictionScores(i))
+            {
+                predictionCategories(i) = cat;
+            }
+        }
+    }
+
+    std::cout << "final output: " << layerOut << std::endl;
+    std::cout << "predictions: " << predictionCategories << "\n"
               << std::endl;
 }

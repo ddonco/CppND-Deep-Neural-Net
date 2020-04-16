@@ -5,27 +5,15 @@
 Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation)
 	: _inputs(inputs), _outputs(outputs), batchSize(batchSize), _activation(activation)
 {
+	srand((unsigned int)time(0));
 	_input = std::make_unique<Eigen::MatrixXf>();
 	_output = std::make_unique<Eigen::MatrixXf>();
 	_weights = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Random(outputs, inputs));
+	*_weights *= 0.01;
 	_weightsDelta = std::make_unique<Eigen::MatrixXf>();
 	_backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
 	_bias = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
 	_biasDelta = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
-
-	// switch (activation)
-	// {
-	// case ActivationFunctionType::relu:
-	// 	_activationFunction = Relu();
-	// 	break;
-
-	// case ActivationFunctionType::softmax:
-	// 	_activationFunction = Softmax();
-	// 	break;
-
-	// default:
-	// 	break;
-	// }
 }
 
 void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
@@ -83,8 +71,8 @@ void Layer::forward(Eigen::MatrixXf &m)
 
 	// Calculate forward pass
 	*_output = (m * (*_weights).transpose()) + *_bias;
-	std::cout << "Weight matrix after transpose:\n"
-			  << *_weights << std::endl;
+	// std::cout << "Weight matrix after transpose:\n"
+	// 		  << *_weights << std::endl;
 	std::cout << "Output matrix:\n"
 			  << *_output << std::endl;
 }
