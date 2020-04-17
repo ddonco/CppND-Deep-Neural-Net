@@ -19,11 +19,13 @@ class Model
 {
 public:
     Model(Config config);
-    void printModel();
     void trainSingle();
     void trainBatch();
     void predictSingle();
     void predictBatch();
+    Eigen::MatrixXf predictedCategories(Eigen::MatrixXf layerOutput);
+    float accuracy(Eigen::MatrixXf yPred, Eigen::MatrixXf yTrue);
+    void printModel();
 
     void testForwardPass();
 

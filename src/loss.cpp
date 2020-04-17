@@ -39,11 +39,13 @@ void CategoricalCrossEntropy::backward(Eigen::MatrixXf backpassDeltaValues, Eige
 {
     // number of training samples
     int numSamples = yTrue.rows();
+    int yTrueCat;
 
     *_backpassDeltaValues = backpassDeltaValues;
     for (int r = 0; r < numSamples; r++)
     {
-        // (*_backpassDeltaValues)(r, yTrue(r)) = (*_backpassDeltaValues)(r, yTrue(r)) - 1;
+        yTrueCat = yTrue(r, 0);
+        (*_backpassDeltaValues)(r, yTrueCat) = (*_backpassDeltaValues)(r, yTrueCat) - 1;
         (*_backpassDeltaValues) = *_backpassDeltaValues / numSamples;
     }
 }

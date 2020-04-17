@@ -64,6 +64,35 @@ Model::Model(Config config)
     }
 }
 
+Eigen::MatrixXf Model::predictedCategories(Eigen::MatrixXf layerOutput)
+{
+    Eigen::MatrixXf predictionScores = layerOutput.rowwise().maxCoeff();
+    Eigen::MatrixXf predictionCategories = Eigen::MatrixXf::Zero(predictionScores.rows(), predictionScores.cols());
+    Eigen::MatrixXf::Index maxIndex;
+    for (int i = 0; i < predictionScores.rows(); i++)
+    {
+        for (int cat = 0; cat < layerOutput.cols(); cat++)
+        {
+            if (layerOutput(i, cat) == predictionScores(i, 0))
+            {
+                predictionCategories(i, 0) = cat;
+            }
+        }
+    }
+    return predictionCategories;
+}
+
+float Model::accuracy(Eigen::MatrixXf yPred, Eigen::MatrixXf yTrue)
+{
+    float accuracy = 0;
+    for (int i = 0; i < yTrue.rows(); i++)
+    {
+        if (yTrue(i, 0) == yPred(i, 0))
+            accuracy++;
+    }
+    return accuracy / yTrue.rows();
+}
+
 void Model::printModel()
 {
     // for (auto &layer : _layers)
@@ -111,25 +140,47 @@ void Model::testForwardPass()
         }
     }
 
-    float lossValue = _loss.forward(layerOut, ytrue);
-    std::cout << "Loss value: " << lossValue << "\n"
+    float loss = _loss.forward(layerOut, ytrue);
+    std::cout << "Loss value: " << loss << "\n"
               << std::endl;
 
-    Eigen::VectorXf predictionScores = layerOut.rowwise().maxCoeff();
-    Eigen::VectorXf predictionCategories = Eigen::VectorXf(predictionScores);
-    Eigen::MatrixXf::Index maxIndex;
-    for (int i = 0; i < predictionScores.size(); i++)
+    Eigen::MatrixXf yPred = predictedCategories(layerOut);
+
+    std::cout << "final output: " << layerOut << std::endl;
+    std::cout << "predictions: " << yPred << "\n"
+              << std::endl;
+
+    std::cout << "accuracy: " << accuracy(yPred, ytrue) << "\n"
+              << std::endl;
+
+    _loss.backward(layerOut, ytrue);
+    Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
+    std::cout << "loss backward: " << backpassDeltaValues << "\n"
+              << std::endl;
+
+    for (int i = _layers.size(); i > 0; i--)
     {
-        for (int cat = 0; cat < layerOut.cols(); cat++)
+        if (auto a = std::get_if<Relu>(&(_activationLayers[i])))
         {
-            if (layerOut(i, cat) == predictionScores(i))
-            {
-                predictionCategories(i) = cat;
-            }
+            Relu &activation = *a;
+            activation.backward(backpassDeltaValues);
+            backpassDeltaValues = *(activation._output);
+        }
+        else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
+        {
+            Softmax &activation = *a;
+            activation.backward(backpassDeltaValues);
+            backpassDeltaValues = *(activation._output);
+        }
+
+        if (auto l = std::get_if<DenseLayer>(&(_layers[i])))
+        {
+            DenseLayer &layer = *l;
+            layer.backward(backpassDeltaValues);
+            backpassDeltaValues = *(layer._output);
         }
     }
 
-    std::cout << "final output: " << layerOut << std::endl;
-    std::cout << "predictions: " << predictionCategories << "\n"
+    std::cout << "final backward: " << backpassDeltaValues << "\n"
               << std::endl;
 }
