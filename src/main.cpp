@@ -5,9 +5,35 @@
 
 using namespace std;
 
+// template <typename M>
+// M readCsv(const std::string &path)
+// {
+//     std::ifstream indata;
+//     indata.open(path);
+//     std::string line;
+//     std::vector<float> values;
+//     uint rows = 0;
+//     while (std::getline(indata, line))
+//     {
+//         std::stringstream lineStream(line);
+//         std::string cell;
+//         while (std::getline(lineStream, cell, ','))
+//         {
+//             values.push_back(std::stod(cell));
+//         }
+//         ++rows;
+//     }
+//     return Eigen::Map<const Eigen::Matrix<typename M::Scalar, M::RowsAtCompileTime, M::ColsAtCompileTime>>(values.data(), rows, values.size() / rows);
+// }
+
 int main()
 {
     std::string configPath = "../config/l3.config";
+
+    std::unique_ptr<Eigen::MatrixXf> trainX = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
+    std::unique_ptr<Eigen::MatrixXf> trainY = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
+    // Eigen::MatrixXf trainY = readCsv<Eigen::MatrixXf>("../data/Y.csv");
+    // std::cout << *trainY << std::endl;
 
     Config networkConfig;
     networkConfig.readConfig(configPath);
@@ -16,7 +42,7 @@ int main()
     Model model = Model(networkConfig);
     model.printModel();
 
-    model.testForwardPass();
+    model.testForwardPass(std::move(trainX), std::move(trainY));
 
     // Eigen::MatrixXf mat(2, 2);
     // mat << 1, 2,

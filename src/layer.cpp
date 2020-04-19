@@ -62,19 +62,19 @@ void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
 void Layer::forward(Eigen::MatrixXf &m)
 {
 	std::cout << "Input matrix:\n"
-			  << m << std::endl;
+			  << m.rows() << ", " << m.cols() << std::endl;
 	std::cout << "Weight matrix:\n"
-			  << *_weights << std::endl;
+			  << (*_weights).rows() << ", " << (*_weights).cols() << std::endl;
 
 	// Save input values
 	*_input = m;
 
 	// Calculate forward pass
-	*_output = (m * (*_weights).transpose()) + *_bias;
+	*_output = (m * (*_weights).transpose()); // + *_bias;
 	// std::cout << "Weight matrix after transpose:\n"
 	// 		  << *_weights << std::endl;
 	std::cout << "Output matrix:\n"
-			  << *_output << std::endl;
+			  << (*_output).rows() << ", " << (*_output).cols() << std::endl;
 }
 
 void Layer::backward(Eigen::MatrixXf &m)
