@@ -2,22 +2,22 @@
 
 Activation::Activation()
 {
-    _input = std::make_unique<Eigen::MatrixXf>();
-    _output = std::make_unique<Eigen::MatrixXf>();
-    _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
+    _input = new Eigen::MatrixXf(1, 1);
+    _output = new Eigen::MatrixXf(1, 1);
+    _backpassDeltaValues = new Eigen::MatrixXf(1, 1);
 }
 
 Relu::Relu()
 {
-    // _input = std::make_unique<Eigen::MatrixXf>();
-    // _output = std::make_unique<Eigen::MatrixXf>();
-    // _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
+    _input = new Eigen::MatrixXf(1, 1);
+    _output = new Eigen::MatrixXf(1, 1);
+    _backpassDeltaValues = new Eigen::MatrixXf(1, 1);
 }
 
 void Relu::forward(Eigen::MatrixXf &m)
 {
-    _input = std::make_unique<Eigen::MatrixXf>(m);
-    _output = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(m.rows(), m.cols()));
+    *_input = m;
+    *_output = Eigen::MatrixXf::Zero(m.rows(), m.cols());
     for (int i = 0; i < (*_input).rows(); i++)
     {
         for (int j = 0; j < (*_input).cols(); j++)
@@ -26,7 +26,7 @@ void Relu::forward(Eigen::MatrixXf &m)
                 (*_output)(i, j) = m(i, j);
         }
     }
-    std::cout << "Relu input address: " << _input.get() << std::endl;
+    std::cout << "Relu input address: " << _input << std::endl;
     std::cout << "Relu output matrix:\n"
               << (*_output).rows() << ", " << (*_output).cols() << "\n"
               << std::endl;
@@ -35,13 +35,13 @@ void Relu::forward(Eigen::MatrixXf &m)
 void Relu::backward(Eigen::MatrixXf &m)
 {
     std::cout << "copied delta address: " << &m << std::endl;
-    std::cout << "Relu delta address: " << _backpassDeltaValues.get() << std::endl;
-    std::cout << "Relu input address: " << _input.get() << std::endl;
-    std::cout << "Relu output address: " << _output.get() << std::endl;
+    std::cout << "Relu delta address: " << _backpassDeltaValues << std::endl;
+    std::cout << "Relu input address: " << _input << std::endl;
+    std::cout << "Relu output address: " << _output << std::endl;
 
-    _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>(m);
+    *_backpassDeltaValues = m;
 
-    std::cout << "Relu delta address: " << _backpassDeltaValues.get() << std::endl;
+    std::cout << "Relu delta address: " << _backpassDeltaValues << std::endl;
     std::cout << "Relu delta matrix:\n"
               << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols() << std::endl;
 
