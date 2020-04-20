@@ -80,12 +80,27 @@ void Layer::forward(Eigen::MatrixXf &m)
 void Layer::backward(Eigen::MatrixXf &m)
 {
 	// Calculate gradient of the weights
+	std::cout << "weights delta matrix: "
+			  << (*_input).rows() << ", " << (*_input).cols()
+			  << " * "
+			  << m.rows() << ", " << m.cols() << " = " << std::endl;
 	*_weightsDelta = (*_input).transpose() * m;
+	std::cout << (*_weightsDelta).rows() << ", " << (*_weightsDelta).cols()
+			  << "\n"
+			  << std::endl;
 
 	*_biasDelta = (*_backpassDeltaValues).colwise().sum();
 
 	// Calculate gradient of the backward pass values
-	*_backpassDeltaValues = m * (*_weights).transpose();
+	std::cout << "weights backdelta matrix: "
+			  << m.rows() << ", " << m.cols()
+			  << " * "
+			  << (*_weights).rows() << ", " << (*_weights).cols()
+			  << " = " << std::endl;
+	*_backpassDeltaValues = m * (*_weights); // need to verify its not weights.transpose()
+	std::cout << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols()
+			  << "\n"
+			  << std::endl;
 }
 
 DenseLayer::DenseLayer(int inputs, int outputs, int batchSize, ActivationFunctionType activation, float dropout = 0.0)

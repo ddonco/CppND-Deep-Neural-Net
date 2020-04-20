@@ -30,6 +30,9 @@ public:
     Relu();
     void forward(Eigen::MatrixXf &m);
     void backward(Eigen::MatrixXf &m);
+    void loadLayerData(std::unique_ptr<Eigen::MatrixXf> _input,
+                       std::unique_ptr<Eigen::MatrixXf> _output,
+                       std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues);
 
     // private:
     std::unique_ptr<Eigen::MatrixXf> _input;

@@ -131,6 +131,7 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
             Relu &activation = *a;
             activation.forward(layerOut);
             layerOut = *(activation._output);
+            std::cout << "Relu forward input address: " << activation._input.get() << std::endl;
         }
         else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
         {
@@ -157,10 +158,8 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
     Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
     std::cout << "loss backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
               << std::endl;
-    std::cout << "loss delta address: " << _loss._backpassDeltaValues.get() << std::endl;
-    std::cout << "copied delta address: " << &backpassDeltaValues << std::endl;
 
-    for (int i = _layers.size(); i > 0; i--)
+    for (int i = _layers.size() - 1; i >= 0; i--)
     {
         if (auto a = std::get_if<Relu>(&(_activationLayers[i])))
         {
