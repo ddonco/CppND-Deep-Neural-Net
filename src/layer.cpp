@@ -5,7 +5,9 @@
 Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation)
 	: _inputs(inputs), _outputs(outputs), batchSize(batchSize), _activation(activation)
 {
-	srand((unsigned int)time(0));
+	// Randomize weights matrix initialization
+	// srand((unsigned int)time(0));
+
 	_input = std::make_unique<Eigen::MatrixXf>();
 	_output = std::make_unique<Eigen::MatrixXf>();
 	_weights = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Random(outputs, inputs));

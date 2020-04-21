@@ -24,15 +24,6 @@ Model::Model(Config config)
                 if (properties.count("dropout"))
                     dropout = std::stof(properties["dropout"]);
 
-                // std::unique_ptr<DenseLayer> layertest = std::make_unique<DenseLayer>(std::stoi(properties["inputs"]),
-                //                                                                  std::stoi(properties["outputs"]),
-                //                                                                  actFunction,
-                //                                                                  dropout);
-                // DenseLayer layer = DenseLayer(std::stoi(properties["inputs"]),
-                //                               std::stoi(properties["outputs"]),
-                //                               actFunction,
-                //                               dropout);
-
                 _layers.emplace_back(DenseLayer(std::stoi(properties["inputs"]),
                                                 std::stoi(properties["outputs"]),
                                                 batchSize,
@@ -110,12 +101,7 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
 {
     std::cout << "*** Forward Pass Test ***" << std::endl;
 
-    Eigen::MatrixXf layerOut = *trainX; // Eigen::MatrixXf::Constant(1, 4, 2);
-    // Eigen::MatrixXf ypred = Eigen::MatrixXf::Constant(1, 1, 2);
-    Eigen::MatrixXf ytrue = Eigen::MatrixXf::Constant(1, 1, 2);
-    // Eigen::MatrixXf layerOut;
-
-    // auto &layer = _layers[0];
+    Eigen::MatrixXf layerOut = *trainX;
 
     for (int i = 0; i < _layers.size(); i++)
     {
@@ -131,7 +117,6 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
             Relu &activation = *a;
             activation.forward(layerOut);
             layerOut = *(activation._output);
-            std::cout << "Relu forward input address: " << activation._input.get() << std::endl;
         }
         else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
         {
@@ -141,6 +126,7 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
         }
     }
 
+    std::cout << "HERE" << std::endl;
     float loss = _loss.forward(layerOut, *trainY);
     std::cout << "Loss value: " << loss << "\n"
               << std::endl;

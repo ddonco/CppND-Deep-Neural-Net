@@ -5,35 +5,20 @@
 
 using namespace std;
 
-// template <typename M>
-// M readCsv(const std::string &path)
-// {
-//     std::ifstream indata;
-//     indata.open(path);
-//     std::string line;
-//     std::vector<float> values;
-//     uint rows = 0;
-//     while (std::getline(indata, line))
-//     {
-//         std::stringstream lineStream(line);
-//         std::string cell;
-//         while (std::getline(lineStream, cell, ','))
-//         {
-//             values.push_back(std::stod(cell));
-//         }
-//         ++rows;
-//     }
-//     return Eigen::Map<const Eigen::Matrix<typename M::Scalar, M::RowsAtCompileTime, M::ColsAtCompileTime>>(values.data(), rows, values.size() / rows);
-// }
-
 int main()
 {
     std::string configPath = "../config/l3.config";
 
-    std::unique_ptr<Eigen::MatrixXf> trainX = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
-    std::unique_ptr<Eigen::MatrixXf> trainY = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
-    // Eigen::MatrixXf trainY = readCsv<Eigen::MatrixXf>("../data/Y.csv");
-    // std::cout << *trainY << std::endl;
+    // std::unique_ptr<Eigen::MatrixXf> trainX = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
+    // std::unique_ptr<Eigen::MatrixXf> trainY = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
+
+    std::unique_ptr<Eigen::MatrixXf> trainX = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(4, 2));
+    *trainX << 1, 2, 3, 4, 5, 6, 7, 8;
+    std::unique_ptr<Eigen::MatrixXf> trainY = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Ones(4, 2));
+
+    // Eigen::MatrixXf trainX = Eigen::MatrixXf::Zero(4, 2);
+    // trainX << 1, 2, 3, 4, 5, 6, 7, 8;
+    // Eigen::MatrixXf trainY = Eigen::MatrixXf::Ones(4, 2);
 
     Config networkConfig;
     networkConfig.readConfig(configPath);
