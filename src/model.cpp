@@ -152,23 +152,24 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
             std::cout << "backward step: " << i << std::endl;
             Relu &activation = *a;
             activation.backward(backpassDeltaValues);
-            backpassDeltaValues = *(activation._output);
+            backpassDeltaValues = *(activation._backpassDeltaValues);
         }
         else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
         {
             Softmax &activation = *a;
             activation.backward(backpassDeltaValues);
-            backpassDeltaValues = *(activation._output);
+            backpassDeltaValues = *(activation._backpassDeltaValues);
         }
 
         if (auto l = std::get_if<DenseLayer>(&(_layers[i])))
         {
             DenseLayer &layer = *l;
             layer.backward(backpassDeltaValues);
-            backpassDeltaValues = *(layer._output);
+            backpassDeltaValues = *(layer._backpassDeltaValues);
         }
     }
 
     std::cout << "final backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
               << std::endl;
+    std::cout << "final backward: " << backpassDeltaValues << std::endl;
 }

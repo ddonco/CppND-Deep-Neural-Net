@@ -77,6 +77,9 @@ void Layer::forward(Eigen::MatrixXf &m)
 	// 		  << *_weights << std::endl;
 	std::cout << "Output matrix:\n"
 			  << (*_output).rows() << ", " << (*_output).cols() << std::endl;
+	std::cout << "Output matrix:\n"
+			  << *_output << "\n"
+			  << std::endl;
 }
 
 void Layer::backward(Eigen::MatrixXf &m)
@@ -94,7 +97,7 @@ void Layer::backward(Eigen::MatrixXf &m)
 	*_biasDelta = (*_backpassDeltaValues).colwise().sum();
 
 	// Calculate gradient of the backward pass values
-	std::cout << "weights backdelta matrix: "
+	std::cout << "values backdelta matrix: "
 			  << m.rows() << ", " << m.cols()
 			  << " * "
 			  << (*_weights).rows() << ", " << (*_weights).cols()
