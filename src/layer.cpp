@@ -72,9 +72,16 @@ void Layer::forward(Eigen::MatrixXf &m)
 	*_input = m;
 
 	// Calculate forward pass
-	*_output = (m * (*_weights).transpose()); // + *_bias;
-	// std::cout << "Weight matrix after transpose:\n"
-	// 		  << *_weights << std::endl;
+	*_output = (m * (*_weights).transpose());
+
+	for (int row = 0; row < (*_output).rows(); row++)
+	{
+		for (int col = 0; col < (*_output).cols(); col++)
+		{
+			(*_output)(row, col) += (*_bias)(0, col);
+		}
+	}
+
 	std::cout << "Output matrix:\n"
 			  << (*_output).rows() << ", " << (*_output).cols() << std::endl;
 	std::cout << "Output matrix:\n"
