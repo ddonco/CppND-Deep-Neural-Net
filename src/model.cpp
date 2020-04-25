@@ -53,6 +53,9 @@ Model::Model(Config config)
             break;
         }
     }
+
+    _loss = CategoricalCrossEntropy();
+    _optimizer = SGD(1);
 }
 
 Eigen::MatrixXf Model::getPredCategories(Eigen::MatrixXf layerOutput)
@@ -172,4 +175,9 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
     std::cout << "final backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
               << std::endl;
     std::cout << "final backward: " << backpassDeltaValues << std::endl;
+
+    for (int l = 0; l < _layers.size(); l++)
+    {
+        // Update layer parameters using optimizer
+    }
 }

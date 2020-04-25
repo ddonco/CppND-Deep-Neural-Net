@@ -7,6 +7,7 @@
 
 #include "activation.h"
 #include "loss.h"
+#include "optimizer.h"
 #include "utils.h"
 
 class Model
@@ -31,6 +32,7 @@ private:
     std::vector<std::variant<DenseLayer>> _layers;
     std::vector<std::variant<Relu, Softmax>> _activationLayers;
     CategoricalCrossEntropy _loss;
+    SGD _optimizer;
 };
 
 #endif
