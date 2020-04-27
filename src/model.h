@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include <memory>
+#include <mutex>
 #include <variant>
 #include <Eigen/Dense>
 

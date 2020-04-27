@@ -112,10 +112,11 @@ void Layer::backward(Eigen::MatrixXf &m)
 {
 	// Calculate gradient of the weights
 	std::cout << "weights delta matrix: "
-			  << (*_input).rows() << ", " << (*_input).cols()
+			  << m.rows() << ", " << m.cols()
+
 			  << " * "
-			  << m.rows() << ", " << m.cols() << " = " << std::endl;
-	*_weightsDelta = (*_input).transpose() * m;
+			  << (*_input).rows() << ", " << (*_input).cols() << " = " << std::endl;
+	*_weightsDelta = m.transpose() * *_input;
 	std::cout << (*_weightsDelta).rows() << ", " << (*_weightsDelta).cols()
 			  << "\n"
 			  << std::endl;
