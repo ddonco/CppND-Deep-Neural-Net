@@ -18,6 +18,25 @@ Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType acti
 	_biasDelta = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(batchSize, outputs));
 }
 
+void Layer::printLayer()
+{
+	std::map<ActivationFunctionType, std::string> mapActivationType;
+	mapActivationType[ActivationFunctionType::relu] = "relu";
+	mapActivationType[ActivationFunctionType::softmax] = "softmax";
+	Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+
+	std::cout << "Layer Type:\n    Layer" << std::endl;
+	std::cout << "Layer Properties:"
+			  << "\n    Inputs: " << _inputs
+			  << "\n    Outputs: " << _outputs
+			  << "\n    Activation: " << mapActivationType[_activation]
+			  << "\n    Weights:\n"
+			  << (*_weights).format(CleanFmt)
+			  << "\n    Bias: " << *_bias
+			  << "\n"
+			  << std::endl;
+}
+
 void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
 {
 	for (std::string item : propertiesRequired)

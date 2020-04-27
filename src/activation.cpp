@@ -7,11 +7,8 @@ Activation::Activation()
     _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
 }
 
-Relu::Relu()
+Activation::~Activation()
 {
-    _input = std::make_unique<Eigen::MatrixXf>();
-    _output = std::make_unique<Eigen::MatrixXf>();
-    _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
 }
 
 void Relu::forward(Eigen::MatrixXf &m)
@@ -43,13 +40,6 @@ void Relu::backward(Eigen::MatrixXf &m)
         }
     }
 }
-
-// Softmax::Softmax()
-// {
-//     _input = std::make_unique<Eigen::MatrixXf>();
-//     _output = std::make_unique<Eigen::MatrixXf>();
-//     _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
-// }
 
 void Softmax::forward(Eigen::MatrixXf &m)
 {

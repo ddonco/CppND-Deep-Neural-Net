@@ -15,29 +15,21 @@ class Activation
 {
 public:
     Activation();
-    void forward(Eigen::MatrixXf &m);
-    void backward(Eigen::MatrixXf &m);
+    virtual ~Activation();
+    virtual void forward(Eigen::MatrixXf &m) {}
+    virtual void backward(Eigen::MatrixXf &m) {}
 
-    // protected:
     std::unique_ptr<Eigen::MatrixXf> _input;
     std::unique_ptr<Eigen::MatrixXf> _output;
     std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;
 };
 
-class Relu
+class Relu : public Activation
 {
 public:
-    Relu();
+    using Activation::Activation;
     void forward(Eigen::MatrixXf &m);
     void backward(Eigen::MatrixXf &m);
-    void loadLayerData(std::unique_ptr<Eigen::MatrixXf> _input,
-                       std::unique_ptr<Eigen::MatrixXf> _output,
-                       std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues);
-
-    // private:
-    std::unique_ptr<Eigen::MatrixXf> _input;
-    std::unique_ptr<Eigen::MatrixXf> _output;
-    std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;
 };
 
 class Softmax : public Activation

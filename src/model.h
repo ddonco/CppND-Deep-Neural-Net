@@ -29,10 +29,10 @@ public:
 private:
     // Vector of pointers to neural network layers.
     // Layers can be of multiple layer types, currently only includes DenseLayer
-    std::vector<std::variant<DenseLayer>> _layers;
-    std::vector<std::variant<Relu, Softmax>> _activationLayers;
+    std::vector<Layer *> _layers;
+    std::vector<Activation *> _activationLayers;
     CategoricalCrossEntropy _loss;
-    SGD _optimizer;
+    StochasticGradientDescent _optimizer;
 };
 
 #endif

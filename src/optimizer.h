@@ -5,13 +5,14 @@
 
 #include "layer.h"
 
-class SGD
+class StochasticGradientDescent
 {
 public:
-    SGD(float learningRate);
+    StochasticGradientDescent(float learningRate);
+    StochasticGradientDescent() {}
     void updateParams(Layer &layer);
 
-    float learningRate;
+    float learningRate{1};
 };
 
 #endif

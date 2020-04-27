@@ -1,7 +1,8 @@
 #include "model.h"
 #include "activation.h"
-#include "utils.h"
+#include "optimizer.h"
 #include "layer.h"
+#include "utils.h"
 
 Model::Model(Config config)
 {
@@ -24,11 +25,12 @@ Model::Model(Config config)
                 if (properties.count("dropout"))
                     dropout = std::stof(properties["dropout"]);
 
-                _layers.emplace_back(DenseLayer(std::stoi(properties["inputs"]),
-                                                std::stoi(properties["outputs"]),
-                                                batchSize,
-                                                actFunction,
-                                                dropout));
+                DenseLayer *layer = new DenseLayer(std::stoi(properties["inputs"]),
+                                                   std::stoi(properties["outputs"]),
+                                                   batchSize,
+                                                   actFunction,
+                                                   dropout);
+                _layers.emplace_back(layer);
                 break;
             }
             catch (const std::exception &e)
@@ -43,19 +45,28 @@ Model::Model(Config config)
         switch (actFunction)
         {
         case ActivationFunctionType::relu:
-            _activationLayers.emplace_back(Relu());
+        {
+            Relu *relu = new Relu();
+            _activationLayers.emplace_back(relu);
             break;
+        }
 
         case ActivationFunctionType::softmax:
-            _activationLayers.emplace_back(Softmax());
+        {
+            Softmax *softmax = new Softmax();
+            _activationLayers.emplace_back(softmax);
+            break;
+        }
 
         default:
+        {
             break;
+        }
         }
     }
 
     _loss = CategoricalCrossEntropy();
-    _optimizer = SGD(1);
+    _optimizer = StochasticGradientDescent(1);
 }
 
 Eigen::MatrixXf Model::getPredCategories(Eigen::MatrixXf layerOutput)
@@ -89,14 +100,10 @@ float Model::accuracy(Eigen::MatrixXf yPred, Eigen::MatrixXf yTrue)
 
 void Model::printModel()
 {
-    // for (auto &layer : _layers)
     for (int l = 0; l < _layers.size(); l++)
     {
-        if (auto value = std::get_if<DenseLayer>(&(_layers[l])))
-        {
-            DenseLayer &v = *value;
-            v.printLayer();
-        }
+        Layer *layer = _layers[l];
+        layer->printLayer();
     }
 }
 
@@ -106,27 +113,15 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
 
     Eigen::MatrixXf layerOut = *trainX;
 
-    for (int i = 0; i < _layers.size(); i++)
+    for (int l = 0; l < _layers.size(); l++)
     {
-        if (auto l = std::get_if<DenseLayer>(&(_layers[i])))
-        {
-            DenseLayer &layer = *l;
-            layer.forward(layerOut);
-            layerOut = *(layer._output);
-        }
+        Layer *layer = _layers[l];
+        layer->forward(layerOut);
+        layerOut = *(layer->_output);
 
-        if (auto a = std::get_if<Relu>(&(_activationLayers[i])))
-        {
-            Relu &activation = *a;
-            activation.forward(layerOut);
-            layerOut = *(activation._output);
-        }
-        else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
-        {
-            Softmax &activation = *a;
-            activation.forward(layerOut);
-            layerOut = *(activation._output);
-        }
+        Activation *activation = _activationLayers[l];
+        activation->forward(layerOut);
+        layerOut = *(activation->_output);
     }
 
     std::cout << "HERE" << std::endl;
@@ -148,28 +143,15 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
     std::cout << "loss backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
               << std::endl;
 
-    for (int i = _layers.size() - 1; i >= 0; i--)
+    for (int l = _layers.size() - 1; l >= 0; l--)
     {
-        if (auto a = std::get_if<Relu>(&(_activationLayers[i])))
-        {
-            std::cout << "backward step: " << i << std::endl;
-            Relu &activation = *a;
-            activation.backward(backpassDeltaValues);
-            backpassDeltaValues = *(activation._backpassDeltaValues);
-        }
-        else if (auto a = std::get_if<Softmax>(&(_activationLayers[i])))
-        {
-            Softmax &activation = *a;
-            activation.backward(backpassDeltaValues);
-            backpassDeltaValues = *(activation._backpassDeltaValues);
-        }
+        Activation *activation = _activationLayers[l];
+        activation->backward(backpassDeltaValues);
+        backpassDeltaValues = *(activation->_backpassDeltaValues);
 
-        if (auto l = std::get_if<DenseLayer>(&(_layers[i])))
-        {
-            DenseLayer &layer = *l;
-            layer.backward(backpassDeltaValues);
-            backpassDeltaValues = *(layer._backpassDeltaValues);
-        }
+        Layer *layer = _layers[l];
+        layer->backward(backpassDeltaValues);
+        backpassDeltaValues = *(layer->_backpassDeltaValues);
     }
 
     std::cout << "final backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
