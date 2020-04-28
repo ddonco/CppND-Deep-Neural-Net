@@ -124,7 +124,6 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
         layerOut = *(activation->_output);
     }
 
-    std::cout << "HERE" << std::endl;
     float loss = _loss.forward(layerOut, *trainY);
     std::cout << "Loss value: " << loss << "\n"
               << std::endl;
