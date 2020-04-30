@@ -15,11 +15,13 @@ float CategoricalCrossEntropy::forward(Eigen::MatrixXf yPred, Eigen::MatrixXf yT
         Eigen::MatrixXf yPredArray = Eigen::MatrixXf::Zero(numSamples, 1);
         for (int r = 0; r < numSamples; r++)
         {
-            int yTrueCat = yTrue(r, Eigen::all).maxCoeff();
+            int yTrueCat = yTrue(r, 0);
             yPredArray(r, 0) = yPred(r, yTrueCat);
         }
         yPred = yPredArray;
     }
+    // std::cout << "ypred:\n"
+    //           << yPred << std::endl;
 
     // Calculate losses
     Eigen::MatrixXf negLogLikelihoods = yPred.array().log();

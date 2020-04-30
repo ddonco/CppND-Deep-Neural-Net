@@ -174,3 +174,54 @@ void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique
                   << std::endl;
     }
 }
+
+void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY)
+{
+    std::cout << "*** Training ***" << std::endl;
+
+    for (int iter = 0; iter < 300; iter++)
+    {
+        Eigen::MatrixXf layerOut = *trainX;
+
+        for (int l = 0; l < _layers.size(); l++)
+        {
+            Layer *layer = _layers[l];
+            layer->forward(layerOut);
+            layerOut = *(layer->_output);
+
+            Activation *activation = _activationLayers[l];
+            activation->forward(layerOut);
+            layerOut = *(activation->_output);
+        }
+
+        float loss = _loss.forward(layerOut, *trainY);
+
+        Eigen::MatrixXf yPred = getPredCategories(layerOut);
+
+        if (iter % 10 == 0)
+            std::cout << "Iteration: " << iter << ", Loss: " << loss << ", Accuracy: "
+                      << accuracy(yPred, *trainY) << "\n"
+                      << std::endl;
+
+        _loss.backward(layerOut, *trainY);
+        Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
+
+        for (int l = _layers.size() - 1; l >= 0; l--)
+        {
+            Activation *activation = _activationLayers[l];
+            activation->backward(backpassDeltaValues);
+            backpassDeltaValues = *(activation->_backpassDeltaValues);
+
+            Layer *layer = _layers[l];
+            layer->backward(backpassDeltaValues);
+            backpassDeltaValues = *(layer->_backpassDeltaValues);
+        }
+
+        for (int l = 0; l < _layers.size(); l++)
+        {
+            // Update layer parameters using optimizer
+            Layer *layer = _layers[l];
+            _optimizer.updateParams(layer);
+        }
+    }
+}

@@ -82,10 +82,10 @@ void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
 
 void Layer::forward(Eigen::MatrixXf &m)
 {
-	std::cout << "Input matrix:\n"
-			  << m.rows() << ", " << m.cols() << std::endl;
-	std::cout << "Weight matrix:\n"
-			  << (*_weights).rows() << ", " << (*_weights).cols() << std::endl;
+	// std::cout << "Input matrix:\n"
+	// 		  << m.rows() << ", " << m.cols() << std::endl;
+	// std::cout << "Weight matrix:\n"
+	// 		  << (*_weights).rows() << ", " << (*_weights).cols() << std::endl;
 
 	// Save input values
 	*_input = m;
@@ -101,27 +101,27 @@ void Layer::forward(Eigen::MatrixXf &m)
 		}
 	}
 
-	std::cout << "Output matrix:\n"
-			  << (*_output).rows() << ", " << (*_output).cols() << std::endl;
-	std::cout << "Output matrix:\n"
-			  << *_output << "\n"
-			  << std::endl;
+	// std::cout << "Output matrix:\n"
+	// 		  << (*_output).rows() << ", " << (*_output).cols() << std::endl;
+	// std::cout << "Output matrix:\n"
+	// 		  << *_output << "\n"
+	// 		  << std::endl;
 }
 
 void Layer::backward(Eigen::MatrixXf &m)
 {
 	// Calculate gradient of the weights
-	std::cout << "weights delta matrix: "
-			  << m.rows() << ", " << m.cols()
+	// std::cout << "weights delta matrix: "
+	// 		  << m.rows() << ", " << m.cols()
+	// 		  << " * "
+	// 		  << (*_input).rows() << ", " << (*_input).cols() << " = " << std::endl;
 
-			  << " * "
-			  << (*_input).rows() << ", " << (*_input).cols() << " = " << std::endl;
 	*_weightsDelta = m.transpose() * *_input;
-	std::cout << (*_weightsDelta).rows() << ", " << (*_weightsDelta).cols()
-			  << "\n"
-			  << std::endl;
+	// std::cout << (*_weightsDelta).rows() << ", " << (*_weightsDelta).cols()
+	// 		  << "\n"
+	// 		  << std::endl;
 
-	*_biasDelta = (*_backpassDeltaValues).colwise().sum();
+	*_biasDelta = m.colwise().sum();
 
 	// Calculate gradient of the backward pass values
 	// std::cout << "values backdelta matrix: "
@@ -130,9 +130,9 @@ void Layer::backward(Eigen::MatrixXf &m)
 	// 		  << (*_weights).rows() << ", " << (*_weights).cols()
 	// 		  << " = " << std::endl;
 	*_backpassDeltaValues = m * (*_weights); // need to verify its not weights.transpose()
-	std::cout << "backpass delta values: " << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols()
-			  << "\n"
-			  << std::endl;
+											 // std::cout << "backpass delta values: " << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols()
+											 // 		  << "\n"
+											 // 		  << std::endl;
 }
 
 DenseLayer::DenseLayer(int inputs, int outputs, int batchSize, ActivationFunctionType activation, float dropout = 0.0)
