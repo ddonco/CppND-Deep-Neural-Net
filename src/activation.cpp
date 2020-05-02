@@ -15,11 +15,11 @@ void Relu::forward(Eigen::MatrixXf &m)
 {
     *_input = m;
     *_output = Eigen::MatrixXf::Zero(m.rows(), m.cols());
-    for (int i = 0; i < (*_input).rows(); i++)
+    for (int i = 0; i < m.rows(); i++)
     {
-        for (int j = 0; j < (*_input).cols(); j++)
+        for (int j = 0; j < m.cols(); j++)
         {
-            if ((*_input)(i, j) > 0)
+            if (m(i, j) > 0)
                 (*_output)(i, j) = m(i, j);
         }
     }
@@ -46,7 +46,6 @@ void Softmax::forward(Eigen::MatrixXf &m)
     *_input = m;
     *_output = Eigen::MatrixXf::Zero(m.rows(), m.cols());
 
-    // Eigen::MatrixXf expValues = m - m.rowwise().maxCoeff(); //.array().exp();
     Eigen::MatrixXf maxValues = m.rowwise().maxCoeff();
     // std::cout << "max values:\n"
     //           << maxValues << std::endl;
@@ -56,12 +55,15 @@ void Softmax::forward(Eigen::MatrixXf &m)
     {
         diffValues(row, Eigen::all) = diffValues(row, Eigen::all).array() - maxValues(row, 0);
     }
+    // std::cout << "diff values:\n"
+    //           << diffValues << std::endl;
+
     Eigen::MatrixXf expValues = diffValues.array().exp();
     // std::cout << "exp values:\n"
     //           << expValues << std::endl;
 
     Eigen::MatrixXf expValuesRowSum = expValues.rowwise().sum();
-    // std::cout << "col sum:\n"
+    // std::cout << "row sum:\n"
     //           << expValuesRowSum
     //           << std::endl;
 
@@ -69,7 +71,7 @@ void Softmax::forward(Eigen::MatrixXf &m)
     {
         for (int col = 0; col < expValues.cols(); col++)
         {
-            (*_output)(row, col) = expValues(row, col) / expValuesRowSum(col);
+            (*_output)(row, col) = expValues(row, col) / expValuesRowSum(row);
         }
     }
     // std::cout << "softmax output:\n"

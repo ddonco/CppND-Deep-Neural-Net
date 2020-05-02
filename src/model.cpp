@@ -65,15 +65,16 @@ Model::Model(Config config)
         }
     }
 
-    CategoricalCrossEntropy _loss();
-    StochasticGradientDescent _optimizer(1);
+    // CategoricalCrossEntropy _loss();
+    // _optimizer = StochasticGradientDescent(0);
+    _optimizer.learningRate = 1;
 }
 
 Eigen::MatrixXf Model::getPredCategories(Eigen::MatrixXf layerOutput)
 {
     Eigen::MatrixXf predictionScores = layerOutput.rowwise().maxCoeff();
     Eigen::MatrixXf predictionCategories = Eigen::MatrixXf::Zero(predictionScores.rows(), predictionScores.cols());
-    Eigen::MatrixXf::Index maxIndex;
+
     for (int i = 0; i < predictionScores.rows(); i++)
     {
         for (int cat = 0; cat < layerOutput.cols(); cat++)
@@ -179,10 +180,11 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
 {
     std::cout << "*** Training ***" << std::endl;
 
-    for (int iter = 0; iter < 300; iter++)
+    Eigen::MatrixXf layerOut;
+    Eigen::MatrixXf yPred;
+    for (int iter = 0; iter < 10001; iter++)
     {
-        Eigen::MatrixXf layerOut = *trainX;
-
+        layerOut = *trainX;
         for (int l = 0; l < _layers.size(); l++)
         {
             Layer *layer = _layers[l];
@@ -196,9 +198,9 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
 
         float loss = _loss.forward(layerOut, *trainY);
 
-        Eigen::MatrixXf yPred = getPredCategories(layerOut);
+        yPred = getPredCategories(layerOut);
 
-        if (iter % 10 == 0)
+        if (iter % 100 == 0)
             std::cout << "Iteration: " << iter << ", Loss: " << loss << ", Accuracy: "
                       << accuracy(yPred, *trainY) << "\n"
                       << std::endl;
@@ -223,5 +225,11 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
             Layer *layer = _layers[l];
             _optimizer.updateParams(layer);
         }
+    }
+
+    std::cout << "prediction - true:" << std::endl;
+    for (int i = 0; i < (*trainY).rows(); i++)
+    {
+        std::cout << yPred(i, 0) << " - " << (*trainY)(i, 0) << std::endl;
     }
 }
