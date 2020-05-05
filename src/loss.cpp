@@ -5,52 +5,54 @@ Loss::Loss()
     _backpassDeltaValues = std::make_unique<Eigen::MatrixXf>();
 }
 
-float CategoricalCrossEntropy::forward(Eigen::MatrixXf yPred, Eigen::MatrixXf yTrue)
+float CategoricalCrossEntropy::forward(Eigen::MatrixXf *yPred, Eigen::MatrixXf *yTrue)
 {
+    // copy of yPred
+    Eigen::MatrixXf yPrediction = *yPred;
     // number of training samples
-    int numSamples = yPred.rows();
+    int numSamples = yPrediction.rows();
     // For categorical labels, calculate probabilities
-    if (yTrue.cols() == 1)
+    if ((*yTrue).cols() == 1)
     {
         Eigen::MatrixXf yPredArray = Eigen::MatrixXf::Zero(numSamples, 1);
         int yTrueCat = 0;
         for (int r = 0; r < numSamples; r++)
         {
-            yTrueCat = yTrue(r, 0);
-            yPredArray(r, 0) = yPred(r, yTrueCat);
+            yTrueCat = (*yTrue)(r, 0);
+            yPredArray(r, 0) = yPrediction(r, yTrueCat);
         }
-        yPred = yPredArray;
+        yPrediction = yPredArray;
     }
     // std::cout << "ypred:\n"
     //           << yPred << std::endl;
 
     // Calculate losses
-    Eigen::MatrixXf negLogLikelihoods = yPred.array().log();
-    negLogLikelihoods = negLogLikelihoods * -1;
+    Eigen::MatrixXf negLogLikelihoods = yPrediction.array().log() * -1;
+    // negLogLikelihoods = negLogLikelihoods * -1;
 
     // For on-hot-encoded labels, mask labels with likelihoods
-    if (yTrue.cols() == 2)
+    if ((*yTrue).cols() == 2)
     {
-        negLogLikelihoods *= yTrue;
+        negLogLikelihoods *= *yTrue;
     }
 
     // Return overall loss of training data
     return negLogLikelihoods.sum() / numSamples;
 }
 
-void CategoricalCrossEntropy::backward(Eigen::MatrixXf values, Eigen::MatrixXf yTrue)
+void CategoricalCrossEntropy::backward(Eigen::MatrixXf *values, Eigen::MatrixXf *yTrue)
 {
     // number of training samples
-    int numSamples = yTrue.rows();
+    int numSamples = (*yTrue).rows();
     int yTrueCat = 0;
-    *_backpassDeltaValues = values;
+    *_backpassDeltaValues = *values;
 
-    // std::cout << "loss backpass values in:\n"
-    //           << *_backpassDeltaValues << std::endl;
+    // std::cout << "loss backpass values in: "
+    //           << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols() << std::endl;
 
     for (int r = 0; r < numSamples; r++)
     {
-        yTrueCat = yTrue(r, 0);
+        yTrueCat = (*yTrue)(r, 0);
         (*_backpassDeltaValues)(r, yTrueCat) -= 1;
     }
     *_backpassDeltaValues /= (float)numSamples;

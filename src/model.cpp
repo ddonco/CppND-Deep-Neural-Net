@@ -70,33 +70,34 @@ Model::Model(Config config)
     _optimizer.learningRate = 1;
 }
 
-Eigen::MatrixXf Model::getPredCategories(Eigen::MatrixXf layerOutput)
+Eigen::MatrixXf *Model::getPredCategories(Eigen::MatrixXf *layerOutput)
 {
-    Eigen::MatrixXf predictionScores = layerOutput.rowwise().maxCoeff();
-    Eigen::MatrixXf predictionCategories = Eigen::MatrixXf::Zero(predictionScores.rows(), predictionScores.cols());
+    Eigen::MatrixXf predictionScores = (*layerOutput).rowwise().maxCoeff();
+    Eigen::MatrixXf *predictionCategories = new Eigen::MatrixXf(predictionScores.rows(), predictionScores.cols());
+    *predictionCategories *= 0;
 
     for (int i = 0; i < predictionScores.rows(); i++)
     {
-        for (int cat = 0; cat < layerOutput.cols(); cat++)
+        for (int cat = 0; cat < (*layerOutput).cols(); cat++)
         {
-            if (layerOutput(i, cat) == predictionScores(i, 0))
+            if ((*layerOutput)(i, cat) == predictionScores(i, 0))
             {
-                predictionCategories(i, 0) = cat;
+                (*predictionCategories)(i, 0) = cat;
             }
         }
     }
     return predictionCategories;
 }
 
-float Model::accuracy(Eigen::MatrixXf yPred, Eigen::MatrixXf yTrue)
+float Model::accuracy(Eigen::MatrixXf *yPred, Eigen::MatrixXf *yTrue)
 {
     float accuracy = 0;
-    for (int i = 0; i < yTrue.rows(); i++)
+    for (int i = 0; i < (*yTrue).rows(); i++)
     {
-        if (yTrue(i, 0) == yPred(i, 0))
+        if ((*yTrue)(i, 0) == (*yPred)(i, 0))
             accuracy++;
     }
-    return accuracy / yTrue.rows();
+    return accuracy / (*yTrue).rows();
 }
 
 void Model::printModel()
@@ -110,113 +111,117 @@ void Model::printModel()
 
 void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY)
 {
-    std::cout << "*** Forward Pass Test ***" << std::endl;
+    // std::cout << "*** Forward Pass Test ***" << std::endl;
 
-    Eigen::MatrixXf layerOut = *trainX;
+    // Eigen::MatrixXf layerOut = *trainX;
 
-    for (int l = 0; l < _layers.size(); l++)
-    {
-        Layer *layer = _layers[l];
-        layer->forward(layerOut);
-        layerOut = *(layer->_output);
+    // for (int l = 0; l < _layers.size(); l++)
+    // {
+    //     Layer *layer = _layers[l];
+    //     layer->forward(layerOut);
+    //     layerOut = *(layer->_output);
 
-        Activation *activation = _activationLayers[l];
-        activation->forward(layerOut);
-        layerOut = *(activation->_output);
-    }
+    //     Activation *activation = _activationLayers[l];
+    //     activation->forward(layerOut);
+    //     layerOut = *(activation->_output);
+    // }
 
-    float loss = _loss.forward(layerOut, *trainY);
-    std::cout << "Loss value: " << loss << "\n"
-              << std::endl;
+    // float loss = _loss.forward(layerOut, *trainY);
+    // std::cout << "Loss value: " << loss << "\n"
+    //           << std::endl;
 
-    Eigen::MatrixXf yPred = getPredCategories(layerOut);
+    // Eigen::MatrixXf yPred = getPredCategories(layerOut);
 
-    std::cout << "final output: " << layerOut.rows() << ", " << layerOut.cols() << std::endl;
-    std::cout << "predictions: " << yPred.rows() << ", " << yPred.cols() << "\n"
-              << std::endl;
+    // std::cout << "final output: " << layerOut.rows() << ", " << layerOut.cols() << std::endl;
+    // std::cout << "predictions: " << yPred.rows() << ", " << yPred.cols() << "\n"
+    //           << std::endl;
 
-    std::cout << "accuracy: " << accuracy(yPred, *trainY) << "\n"
-              << std::endl;
+    // std::cout << "accuracy: " << accuracy(yPred, *trainY) << "\n"
+    //           << std::endl;
 
-    _loss.backward(layerOut, *trainY);
-    Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
-    std::cout << "loss backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
-              << std::endl;
+    // _loss.backward(layerOut, *trainY);
+    // Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
+    // std::cout << "loss backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
+    //           << std::endl;
 
-    for (int l = _layers.size() - 1; l >= 0; l--)
-    {
-        Activation *activation = _activationLayers[l];
-        activation->backward(backpassDeltaValues);
-        backpassDeltaValues = *(activation->_backpassDeltaValues);
+    // for (int l = _layers.size() - 1; l >= 0; l--)
+    // {
+    //     Activation *activation = _activationLayers[l];
+    //     activation->backward(backpassDeltaValues);
+    //     backpassDeltaValues = *(activation->_backpassDeltaValues);
 
-        Layer *layer = _layers[l];
-        layer->backward(backpassDeltaValues);
-        backpassDeltaValues = *(layer->_backpassDeltaValues);
-    }
+    //     Layer *layer = _layers[l];
+    //     layer->backward(backpassDeltaValues);
+    //     backpassDeltaValues = *(layer->_backpassDeltaValues);
+    // }
 
-    std::cout << "final backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
-              << std::endl;
-    std::cout << "final backward: " << backpassDeltaValues << "\n"
-              << std::endl;
+    // std::cout << "final backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
+    //           << std::endl;
+    // std::cout << "final backward: " << backpassDeltaValues << "\n"
+    //           << std::endl;
 
-    for (int l = 0; l < _layers.size(); l++)
-    {
-        // Update layer parameters using optimizer
-        Layer *layer = _layers[l];
+    // for (int l = 0; l < _layers.size(); l++)
+    // {
+    //     // Update layer parameters using optimizer
+    //     Layer *layer = _layers[l];
 
-        std::cout << "weights before:\n"
-                  << *((*layer)._weights) << "\n"
-                  << std::endl;
+    //     std::cout << "weights before:\n"
+    //               << *((*layer)._weights) << "\n"
+    //               << std::endl;
 
-        _optimizer.updateParams(layer);
+    //     _optimizer.updateParams(layer);
 
-        std::cout << "weights after:\n"
-                  << *((*layer)._weights) << "\n"
-                  << std::endl;
-    }
+    //     std::cout << "weights after:\n"
+    //               << *((*layer)._weights) << "\n"
+    //               << std::endl;
+    // }
 }
 
 void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY)
 {
     std::cout << "*** Training ***" << std::endl;
 
-    Eigen::MatrixXf layerOut;
-    Eigen::MatrixXf yPred;
+    Eigen::MatrixXf *layerOut;
+    Eigen::MatrixXf *yPred;
     for (int iter = 0; iter < 10001; iter++)
     {
-        layerOut = *trainX;
+        layerOut = trainX.get();
         for (int l = 0; l < _layers.size(); l++)
         {
             Layer *layer = _layers[l];
             layer->forward(layerOut);
-            layerOut = *(layer->_output);
+            layerOut = layer->_output.get();
 
             Activation *activation = _activationLayers[l];
             activation->forward(layerOut);
-            layerOut = *(activation->_output);
+            layerOut = activation->_output.get();
         }
 
-        float loss = _loss.forward(layerOut, *trainY);
+        float loss = _loss.forward(layerOut, trainY.get());
+        // std::cout << "layer out: "
+        //           << (*layerOut).rows() << ", " << (*layerOut).cols() << "\n"
+        //           << std::endl;
 
         yPred = getPredCategories(layerOut);
 
         if (iter % 100 == 0)
             std::cout << "Iteration: " << iter << ", Loss: " << loss << ", Accuracy: "
-                      << accuracy(yPred, *trainY) << "\n"
+                      << accuracy(yPred, trainY.get()) << "\n"
                       << std::endl;
 
-        _loss.backward(layerOut, *trainY);
-        Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
+        _loss.backward(layerOut, trainY.get());
+        // std::cout << "HERE" << std::endl;
+        Eigen::MatrixXf *backpassDeltaValues = _loss._backpassDeltaValues.get();
 
         for (int l = _layers.size() - 1; l >= 0; l--)
         {
             Activation *activation = _activationLayers[l];
             activation->backward(backpassDeltaValues);
-            backpassDeltaValues = *(activation->_backpassDeltaValues);
+            backpassDeltaValues = activation->_backpassDeltaValues.get();
 
             Layer *layer = _layers[l];
             layer->backward(backpassDeltaValues);
-            backpassDeltaValues = *(layer->_backpassDeltaValues);
+            backpassDeltaValues = layer->_backpassDeltaValues.get();
         }
 
         for (int l = 0; l < _layers.size(); l++)
@@ -230,6 +235,6 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
     std::cout << "prediction - true:" << std::endl;
     for (int i = 0; i < (*trainY).rows(); i++)
     {
-        std::cout << yPred(i, 0) << " - " << (*trainY)(i, 0) << std::endl;
+        std::cout << (*yPred)(i, 0) << " - " << (*trainY)(i, 0) << std::endl;
     }
 }

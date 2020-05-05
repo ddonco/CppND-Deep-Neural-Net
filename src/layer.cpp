@@ -37,53 +37,10 @@ void Layer::printLayer()
 			  << std::endl;
 }
 
-// void Layer::setRequiredProperties(std::map<std::string, std::string> properties)
-// {
-// 	for (std::string item : propertiesRequired)
-// 	{
-// 		try
-// 		{
-// 			if (item == "inputs")
-// 			{
-// 				_inputs = std::stoi(properties[item]);
-// 				_inputsSet = true;
-// 			}
-// 			if (item == "outputs")
-// 			{
-// 				_outputs = std::stoi(properties[item]);
-// 				_outputsSet = true;
-// 			}
-// 			if (item == "activation")
-// 			{
-// 				_activation = Utils::parseActivationFunction(properties[item]);
-// 				_actiationSet = true;
-// 			}
-// 		}
-// 		catch (const std::exception &ex)
-// 		{
-// 			std::cout << ex.what() << std::endl;
-// 		}
-// 	}
-
-// 	try
-// 	{
-// 		if (!_inputsSet)
-// 			throw "Inputs property not set.";
-// 		if (!_outputsSet)
-// 			throw "Outputs property not set.";
-// 		if (!_actiationSet)
-// 			throw "Activation property not set.";
-// 	}
-// 	catch (std::string e)
-// 	{
-// 		std::cout << e << std::endl;
-// 	}
-// }
-
-void Layer::forward(Eigen::MatrixXf &m)
+void Layer::forward(Eigen::MatrixXf *m)
 {
 	// Save input values
-	*_input = m;
+	*_input = *m;
 
 	// std::cout << "Input matrix:\n"
 	// 		  << (*_input).rows() << ", " << (*_input).cols() << std::endl;
@@ -91,7 +48,7 @@ void Layer::forward(Eigen::MatrixXf &m)
 	// 		  << (*_weights).rows() << ", " << (*_weights).cols() << std::endl;
 
 	// Calculate forward pass
-	*_output = m * *_weights;
+	*_output = *m * *_weights;
 
 	for (int row = 0; row < (*_output).rows(); row++)
 	{
@@ -108,7 +65,7 @@ void Layer::forward(Eigen::MatrixXf &m)
 	// 		  << std::endl;
 }
 
-void Layer::backward(Eigen::MatrixXf &m)
+void Layer::backward(Eigen::MatrixXf *m)
 {
 	// Calculate gradient of the weights
 	// std::cout << "weights delta matrix: "
@@ -122,12 +79,12 @@ void Layer::backward(Eigen::MatrixXf &m)
 	// std::cout << "m:\n"
 	// 		  << m << "\n"
 	// 		  << std::endl;
-	*_weightsDelta = (*_input).transpose() * m;
+	*_weightsDelta = (*_input).transpose() * *m;
 	// std::cout << (*_weightsDelta).rows() << ", " << (*_weightsDelta).cols()
 	// 		  << "\n"
 	// 		  << std::endl;
 
-	*_biasDelta = m.colwise().sum();
+	*_biasDelta = (*m).colwise().sum();
 	// std::cout << "bias delta: " << (*_biasDelta).rows() << ", " << (*_biasDelta).cols() << std::endl;
 
 	// Calculate gradient of the backward pass values
@@ -136,10 +93,10 @@ void Layer::backward(Eigen::MatrixXf &m)
 	// 		  << " * "
 	// 		  << (*_weights).rows() << ", " << (*_weights).cols()
 	// 		  << " = " << std::endl;
-	*_backpassDeltaValues = m * (*_weights).transpose(); // need to verify its not weights.transpose()
-														 // std::cout << "backpass delta values: " << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols()
-														 // 		  << "\n"
-														 // 		  << std::endl;
+	*_backpassDeltaValues = *m * (*_weights).transpose(); // need to verify its not weights.transpose()
+														  // std::cout << "backpass delta values: " << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols()
+														  // 		  << "\n"
+														  // 		  << std::endl;
 }
 
 DenseLayer::DenseLayer(int inputs, int outputs, int batchSize, ActivationFunctionType activation, float dropout = 0.0)
