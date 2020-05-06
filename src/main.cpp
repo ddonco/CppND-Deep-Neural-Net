@@ -8,27 +8,50 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     std::string mode, config, weights;
-    std::string trainX, trainY;
-    std::string testX;
-    if (argc < 3)
+    std::string trainXPath, trainYPath;
+    std::string testXPath;
+    if (argc < 5)
     {
+        std::cout << "Usage: [train/test] [config path] [weights path] <option(s)>\n"
+                  << "**Note: Train X and Train Y data must be passed (in that order) if mode is 'train'.\n"
+                  << "Test X data must be passed if mode is 'test'.**"
+                  << "Options:\n"
+                  << "    <train X data path if mode is train>\n"
+                  << "    <train Y data path if mode is train>\n"
+                  << "    <test X data path if mode is test>\n"
+                  << std::endl;
+        // return 1;
+    }
+    std::cout << "Arguments:" << std::endl;
+    for (int i = 0; i < argc; i++)
+    {
+        std::cout << i << ": " << argv[i] << std::endl;
     }
 
-    mode = argv[0];
-    config = argv[1];
-    weights = argv[2];
+    mode = argv[1];
+    config = argv[2];
+    weights = argv[3];
     if (mode == "train")
     {
-        trainX = argv[3];
-        trainY = argv[4];
+        if (argc < 6)
+        {
+            // return 1;
+        }
+        trainXPath = argv[4];
+        trainYPath = argv[5];
     }
     else if (mode == "test")
     {
-        testX = argv[3];
+        testXPath = argv[4];
     }
     else
     {
-        std::cout << "Unsupported argument in position [0]: " << mode << std::endl;
+        std::cout << "Unsupported argument in position [1]: " << mode << std::endl;
+    }
+    std::cout << "Arguments:" << std::endl;
+    for (int i = 0; i < argc; i++)
+    {
+        std::cout << argv[i] << std::endl;
     }
 
     std::string configPath = "../config/l3.config";
@@ -46,42 +69,13 @@ int main(int argc, char *argv[])
 
     Config networkConfig;
     networkConfig.readConfig(configPath);
-    // networkConfig.printConfig();
 
     Model model = Model(networkConfig);
     model.printModel();
+    model.saveWeights(weights);
 
     // model.testForwardPass(std::move(trainX), std::move(trainY));
     // model.train(std::move(trainX), std::move(trainY));
-
-    Eigen::MatrixXf *a = new Eigen::MatrixXf(64, 64);
-    *a = Eigen::MatrixXf::Random(64, 64);
-    Eigen::MatrixXf *b = new Eigen::MatrixXf(64, 64);
-    *b = Eigen::MatrixXf::Random(64, 64);
-
-    for (int i = 0; i < 10001; i++)
-    {
-        for (int j = 0; j < 6; j++)
-        {
-            Eigen::MatrixXf c = *a * *b;
-            for (int row = 0; row < (*a).rows(); row++)
-            {
-                for (int col = 0; col < (*a).cols(); col++)
-                {
-                    c(row, col) = (*a)(row, col) + (*b)(row, col);
-                }
-            }
-            for (int row = 0; row < (*b).rows(); row++)
-            {
-                for (int col = 0; col < (*b).cols(); col++)
-                {
-                    c(row, col) = (*a)(row, col) + (*b)(row, col);
-                }
-            }
-        }
-        if (i % 100 == 0)
-            std::cout << "iteration: " << i << std::endl;
-    }
 
     return 0;
 }

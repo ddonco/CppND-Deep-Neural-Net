@@ -70,6 +70,27 @@ Model::Model(Config config)
     _optimizer.learningRate = 1;
 }
 
+void Model::loadWeights(const std::string &weightsPath)
+{
+    if (Utils::fileExists(weightsPath))
+    {
+    }
+}
+
+void Model::saveWeights(const std::string &weightsPath)
+{
+    std::ofstream file(weightsPath);
+    if (file.is_open())
+    {
+        for (int l = 0; l < _layers.size(); l++)
+        {
+            Eigen::MatrixXf m = *(_layers[l]->_weights);
+            file << "layer " << l << ":\n"
+                 << m << std::endl;
+        }
+    }
+}
+
 Eigen::MatrixXf *Model::getPredCategories(Eigen::MatrixXf *layerOutput)
 {
     Eigen::MatrixXf predictionScores = (*layerOutput).rowwise().maxCoeff();

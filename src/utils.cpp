@@ -47,6 +47,16 @@ LayerType Config::getLayer(std::string value)
     }
 }
 
+bool Utils::fileExists(const std::string &filePath)
+{
+    if (FILE *file = fopen(filePath.c_str(), "r"))
+    {
+        fclose(file);
+        return true;
+    }
+    return false;
+}
+
 std::vector<std::string> Utils::parseProperties(std::string value)
 {
     value.erase(std::remove(value.begin(), value.end(), ' '), value.end());

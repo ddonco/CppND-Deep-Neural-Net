@@ -15,16 +15,17 @@ class Model
 {
 public:
     Model(Config config);
-    void trainSingle();
-    void trainBatch();
-    void predictSingle();
-    void predictBatch();
-    Eigen::MatrixXf *getPredCategories(Eigen::MatrixXf *layerOutput);
     float accuracy(Eigen::MatrixXf *yPred, Eigen::MatrixXf *yTrue);
+    Eigen::MatrixXf *getPredCategories(Eigen::MatrixXf *layerOutput);
+    void loadWeights(const std::string &weightsPath);
+    void predictBatch();
+    void predictSingle();
+    void trainBatch();
     void printModel();
-
+    void saveWeights(const std::string &weightsPath);
     void testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY);
     void train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY);
+    void trainSingle();
 
     int batchSize{1};
 
