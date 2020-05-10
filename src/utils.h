@@ -6,14 +6,17 @@
 #include <vector>
 #include <fstream>
 #include <regex>
+#include <Eigen/Dense>
 
 #include "activation.h"
 #include "layer.h"
 
+#define MAXBUFSIZE ((int)1e6)
+
 class Config
 {
 public:
-    LayerType getLayer(std::string key);
+    LayerType getLayerType(std::string key);
     void printConfig();
     void readConfig(std::string configPath);
 
@@ -26,7 +29,9 @@ private:
 
 namespace Utils
 {
+Eigen::MatrixXf bufferToMatrix(float *buff, int rows, int cols);
 bool fileExists(const std::string &filePath);
+Eigen::MatrixXf loadMatrix(const std::string &filePath);
 ActivationFunctionType parseActivationFunction(std::string value);
 int parseInputsOutputs(std::string value);
 std::vector<std::string> parseProperties(std::string value);

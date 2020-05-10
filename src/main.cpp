@@ -1,7 +1,7 @@
-#include "utils.h"
-#include "model.h"
 #include <iostream>
 #include <Eigen/Dense>
+
+#include "model.h"
 
 using namespace std;
 
@@ -73,6 +73,7 @@ int main(int argc, char *argv[])
     Model model = Model(networkConfig);
     model.printModel();
     model.saveWeights(weights);
+    model.loadWeights(weights);
 
     // model.testForwardPass(std::move(trainX), std::move(trainY));
     // model.train(std::move(trainX), std::move(trainY));

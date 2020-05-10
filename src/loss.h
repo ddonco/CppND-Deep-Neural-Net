@@ -18,8 +18,8 @@ class CategoricalCrossEntropy : public Loss
 {
 public:
     using Loss::Loss;
-    float forward(Eigen::MatrixXf *yPred, Eigen::MatrixXf *yTrue);
     void backward(Eigen::MatrixXf *values, Eigen::MatrixXf *yTrue);
+    float forward(Eigen::MatrixXf *yPred, Eigen::MatrixXf *yTrue);
 };
 
 #endif

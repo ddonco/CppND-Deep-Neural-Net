@@ -7,9 +7,12 @@
 #include <Eigen/Dense>
 
 #include "activation.h"
+#include "layer.h"
 #include "loss.h"
 #include "optimizer.h"
 #include "utils.h"
+
+#define MAXBUFSIZE ((int)1e6)
 
 class Model
 {

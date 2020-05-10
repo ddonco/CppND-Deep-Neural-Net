@@ -20,10 +20,10 @@ class Layer
 {
 public:
     Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation);
-    virtual void printLayer();
-    void setRequiredProperties(std::map<std::string, std::string> properties) {}
     void forward(Eigen::MatrixXf *m);
     void backward(Eigen::MatrixXf *m);
+    virtual void printLayer();
+    void setRequiredProperties(std::map<std::string, std::string> properties) {}
 
     std::vector<std::string> propertiesRequired{"inputs", "outputs", "activation"};
     int batchSize;

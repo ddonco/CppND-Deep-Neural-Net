@@ -1,6 +1,4 @@
 #include "layer.h"
-#include "model.h"
-#include "utils.h"
 
 Layer::Layer(int inputs, int outputs, int batchSize, ActivationFunctionType activation)
 	: _inputs(inputs), _outputs(outputs), batchSize(batchSize), _activation(activation)

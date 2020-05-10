@@ -1,8 +1,4 @@
 #include "model.h"
-#include "activation.h"
-#include "optimizer.h"
-#include "layer.h"
-#include "utils.h"
 
 Model::Model(Config config)
 {
@@ -74,6 +70,43 @@ void Model::loadWeights(const std::string &weightsPath)
 {
     if (Utils::fileExists(weightsPath))
     {
+        int cols = 0, rows = 0;
+        float buff[MAXBUFSIZE];
+
+        std::ifstream filestream(weightsPath);
+        if (filestream.is_open())
+        {
+            std::string line, token;
+            int layer = 0;
+            int pos = 0;
+            Eigen::MatrixXf *weights;
+            while (std::getline(filestream, line))
+            {
+                if (line.find("layer") != std::string::npos && pos > 0)
+                {
+                    Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
+                    *(_layers[layer]->_weights) = m;
+                    // std::cout << "shape: " << m.rows() << ", " << m.cols() << std::endl;
+                    // std::cout << "layer: " << m.sum() << std::endl;
+                    // std::cout << m << std::endl;
+                    layer++;
+                    pos = 0;
+                    std::fill_n(buff, MAXBUFSIZE, 0);
+                }
+
+                std::istringstream linestream(line);
+
+                while (linestream >> buff[pos])
+                {
+                    pos++;
+                }
+            }
+            Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
+            *(_layers[layer]->_weights) = m;
+            // std::cout << "shape: " << m.rows() << ", " << m.cols() << std::endl;
+            // std::cout << "layer: " << m.sum() << std::endl;
+            // std::cout << m << std::endl;
+        }
     }
 }
 
@@ -85,8 +118,9 @@ void Model::saveWeights(const std::string &weightsPath)
         for (int l = 0; l < _layers.size(); l++)
         {
             Eigen::MatrixXf m = *(_layers[l]->_weights);
-            file << "layer " << l << ":\n"
+            file << "layer " << l << "\n"
                  << m << std::endl;
+            std::cout << "layer: " << m.sum() << std::endl;
         }
     }
 }

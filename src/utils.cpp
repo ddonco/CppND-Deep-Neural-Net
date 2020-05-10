@@ -14,7 +14,7 @@ void Config::readConfig(std::string configPath)
 
             if (value.find("[") != std::string::npos)
             {
-                LayerType layer = getLayer(value);
+                LayerType layer = getLayerType(value);
                 layers.push_back(layer);
             }
             else if (line == "")
@@ -32,7 +32,7 @@ void Config::readConfig(std::string configPath)
     }
 }
 
-LayerType Config::getLayer(std::string value)
+LayerType Config::getLayerType(std::string value)
 {
     try
     {
@@ -55,6 +55,70 @@ bool Utils::fileExists(const std::string &filePath)
         return true;
     }
     return false;
+}
+
+Eigen::MatrixXf Utils::bufferToMatrix(float *buff, int rows, int cols)
+{
+    Eigen::MatrixXf m(rows, cols);
+    for (int row = 0; row < rows; row++)
+        for (int col = 0; col < cols; col++)
+        {
+            m(row, col) = buff[row * cols + col];
+        }
+
+    return m;
+}
+
+Eigen::MatrixXf Utils::loadMatrix(const std::string &filePath)
+{
+    int cols = 0, rows = 0;
+    float buff[MAXBUFSIZE];
+
+    // // Read numbers from file into buffer.
+    std::ifstream filestream(filePath);
+    // // file.open(filePath);
+    if (filestream.is_open())
+    {
+        std::string line, token;
+        while (std::getline(filestream, line))
+        {
+            int temp_cols = 0;
+            std::stringstream linestream(line);
+            std::stringstream stream;
+
+            while (!linestream.eof())
+            {
+                linestream >> token;
+                if (token.find("layer_") != std::string::npos)
+                {
+                    std::cout << token << std::endl;
+                }
+                else
+                {
+                    stream.str(token);
+                    stream >> buff[cols * rows + temp_cols++];
+                }
+
+                if (temp_cols == 0)
+                    continue;
+
+                if (cols == 0)
+                    cols = temp_cols;
+
+                rows++;
+                // std::cout << buff << std::endl;
+            }
+        }
+    }
+    rows--;
+
+    // Populate matrix with numbers.
+    Eigen::MatrixXf m(rows, cols);
+    for (int i = 0; i < rows; i++)
+        for (int j = 0; j < cols; j++)
+            m(i, j) = buff[cols * i + j];
+
+    return m;
 }
 
 std::vector<std::string> Utils::parseProperties(std::string value)
