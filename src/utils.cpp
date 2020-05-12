@@ -182,6 +182,34 @@ void Config::printConfig()
     }
 }
 
+void Utils::plot(Eigen::MatrixXf *x, Eigen::MatrixXf *y)
+{
+    std::vector<int> cats((*y).data(), (*y).data() + (*y).rows() * (*y).cols());
+    std::vector<std::string> colors{"blue", "gray", "red", "orange", "yellow", "black", "green"};
+
+    std::sort(cats.begin(), cats.end());
+    std::vector<int>::iterator it;
+    it = std::unique(cats.begin(), cats.end());
+
+    cats.resize(distance(cats.begin(), it));
+
+    for (int cat = 0; cat < cats.size(); cat++)
+    {
+        std::vector<double> xVec;
+        std::vector<double> yVec;
+        for (int i = 0; i < x->rows(); ++i)
+        {
+            if ((*y)(i, 0) == cat)
+            {
+                xVec.push_back((*x)(i, 0));
+                yVec.push_back((*x)(i, 1));
+                plt::scatter(xVec, yVec, 5, {{"c", colors[cat]}, {"marker", "o"}});
+            }
+        }
+    }
+    plt::show();
+}
+
 std::vector<std::string> Utils::splitString(const std::string &s, char delimiter)
 {
     std::string token;

@@ -25,7 +25,9 @@ public:
     void predictSingle();
     void trainBatch();
     void printModel();
+    void predict(std::unique_ptr<Eigen::MatrixXf> testX);
     void saveWeights(const std::string &weightsPath);
+    void test(std::unique_ptr<Eigen::MatrixXf> testX, std::unique_ptr<Eigen::MatrixXf> testY);
     void testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY);
     void train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY);
     void trainSingle();

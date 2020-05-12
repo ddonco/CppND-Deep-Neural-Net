@@ -120,7 +120,6 @@ void Model::saveWeights(const std::string &weightsPath)
             Eigen::MatrixXf m = *(_layers[l]->_weights);
             file << "layer " << l << "\n"
                  << m << std::endl;
-            std::cout << "layer: " << m.sum() << std::endl;
         }
     }
 }
@@ -162,6 +161,57 @@ void Model::printModel()
         Layer *layer = _layers[l];
         layer->printLayer();
     }
+}
+
+void Model::predict(std::unique_ptr<Eigen::MatrixXf> testX)
+{
+    std::cout << "*** Predict ***" << std::endl;
+
+    Eigen::MatrixXf *layerOut;
+    Eigen::MatrixXf *yPred;
+
+    layerOut = testX.get();
+    for (int l = 0; l < _layers.size(); l++)
+    {
+        Layer *layer = _layers[l];
+        layer->forward(layerOut);
+        layerOut = layer->_output.get();
+
+        Activation *activation = _activationLayers[l];
+        activation->forward(layerOut);
+        layerOut = activation->_output.get();
+    }
+
+    yPred = getPredCategories(layerOut);
+    std::cout << "Predictions:\n"
+              << yPred << std::endl;
+    Utils::plot(testX.get(), yPred);
+}
+
+void Model::test(std::unique_ptr<Eigen::MatrixXf> testX, std::unique_ptr<Eigen::MatrixXf> testY)
+{
+    std::cout << "*** Test ***" << std::endl;
+
+    Eigen::MatrixXf *layerOut;
+    Eigen::MatrixXf *yPred;
+
+    layerOut = testX.get();
+    for (int l = 0; l < _layers.size(); l++)
+    {
+        Layer *layer = _layers[l];
+        layer->forward(layerOut);
+        layerOut = layer->_output.get();
+
+        Activation *activation = _activationLayers[l];
+        activation->forward(layerOut);
+        layerOut = activation->_output.get();
+    }
+
+    yPred = getPredCategories(layerOut);
+
+    std::cout << "Test Accuracy: " << accuracy(yPred, testY.get()) << "\n"
+              << std::endl;
+    Utils::plot(testX.get(), yPred);
 }
 
 void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY)

@@ -8,17 +8,18 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     std::string mode, config, weights;
-    std::string trainXPath, trainYPath;
-    std::string testXPath;
+    std::string xPath, yPath;
     if (argc < 5)
     {
-        std::cout << "Usage: [train/test] [config path] [weights path] <option(s)>\n"
+        std::cout << "Usage: [train/test/pred] [config path] [weights path] <option(s)>\n"
                   << "**Note: Train X and Train Y data must be passed (in that order) if mode is 'train'.\n"
-                  << "Test X data must be passed if mode is 'test'.**"
+                  << "Test X and Test Y data must be passed if mode is 'test'.\n**"
+                  << "Prediction X data must be passed if mode is 'pred'.\n"
                   << "Options:\n"
                   << "    <train X data path if mode is train>\n"
                   << "    <train Y data path if mode is train>\n"
                   << "    <test X data path if mode is test>\n"
+                  << "    <pred X data path if mode is pred>\n"
                   << std::endl;
         // return 1;
     }
@@ -31,18 +32,18 @@ int main(int argc, char *argv[])
     mode = argv[1];
     config = argv[2];
     weights = argv[3];
-    if (mode == "train")
+    if (mode == "train" || mode == "test")
     {
         if (argc < 6)
         {
             // return 1;
         }
-        trainXPath = argv[4];
-        trainYPath = argv[5];
+        xPath = argv[4];
+        yPath = argv[5];
     }
-    else if (mode == "test")
+    else if (mode == "pred")
     {
-        testXPath = argv[4];
+        xPath = argv[4];
     }
     else
     {
@@ -56,27 +57,36 @@ int main(int argc, char *argv[])
 
     std::string configPath = "../config/l3.config";
 
-    std::unique_ptr<Eigen::MatrixXf> trainX = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
-    std::unique_ptr<Eigen::MatrixXf> trainY = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
+    if (!xPath.empty())
+        std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(xPath));
 
-    // std::unique_ptr<Eigen::MatrixXf> trainX = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(4, 2));
-    // *trainX << 1, 2, 3, 4, 5, 6, 7, 8;
-    // std::unique_ptr<Eigen::MatrixXf> trainY = std::make_unique<Eigen::MatrixXf>(Eigen::MatrixXf::Zero(4, 1));
+    if (!yPath.empty())
+        std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(yPath));
 
-    // Eigen::MatrixXf trainX = Eigen::MatrixXf::Zero(4, 2);
-    // trainX << 1, 2, 3, 4, 5, 6, 7, 8;
-    // Eigen::MatrixXf trainY = Eigen::MatrixXf::Ones(4, 2);
+    std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
+    std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
 
     Config networkConfig;
     networkConfig.readConfig(configPath);
 
     Model model = Model(networkConfig);
     model.printModel();
-    model.saveWeights(weights);
     model.loadWeights(weights);
 
+    if (mode == "train")
+    {
+        model.train(std::move(xData), std::move(yData));
+        model.saveWeights(weights);
+    }
+    else if (mode == "test")
+    {
+        model.test(std::move(xData), std::move(yData));
+    }
+    else if (mode == "pred")
+    {
+        model.predict(std::move(xData));
+    }
     // model.testForwardPass(std::move(trainX), std::move(trainY));
-    // model.train(std::move(trainX), std::move(trainY));
 
     return 0;
 }

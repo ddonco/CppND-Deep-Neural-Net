@@ -1,17 +1,21 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <algorithm>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <regex>
 #include <Eigen/Dense>
+#include "matplotlibcpp.h"
 
 #include "activation.h"
 #include "layer.h"
 
 #define MAXBUFSIZE ((int)1e6)
+namespace plt = matplotlibcpp;
 
 class Config
 {
@@ -35,6 +39,7 @@ Eigen::MatrixXf loadMatrix(const std::string &filePath);
 ActivationFunctionType parseActivationFunction(std::string value);
 int parseInputsOutputs(std::string value);
 std::vector<std::string> parseProperties(std::string value);
+void plot(Eigen::MatrixXf *x, Eigen::MatrixXf *y);
 std::vector<std::string> splitString(const std::string &s, char delimiter);
 }; // namespace Utils
 
