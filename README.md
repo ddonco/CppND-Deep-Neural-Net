@@ -20,7 +20,7 @@ This capstone project implements a simple deep neural network for training and i
   - C++ wrapper is already included in project source but can also be cloned from github [https://github.com/lava/matplotlib-cpp]
   - requirements for matplotlib-cpp can be satisfied by running: `sudo apt-get install python-matplotlib python-numpy python2.7-dev`
 
-## Basic Build Instructions
+## Build Instructions
 
 1. Clone this repo.
 2. Make a build directory in the top level directory: `mkdir build && cd build`
@@ -61,3 +61,22 @@ Finally, a trained model can be used for inferencing, which is essentially predi
 
 A complete prediction command is as follows:
 `./DNN pred ../config/l3.config ../data/test_5-12.weights ../data/X.csv`
+
+## Source Code
+
+A bief overview of the project sorce code.
+
+- activation.cpp & activation.h
+  Implements the ReLU and Softmax activation functions of the neural network.
+- layer.cpp & layer.h
+  Implements the Dense layer of the neural network.
+- loss.cpp & loss.h
+  Implements the Categorical Cross-Entropy loss function of the neural network.
+- optimizer.cpp & optimizer.h
+  Implements the Stocastic Gradient Descent optimizer function of the neural network.
+- utils.cpp & utils.h
+  Implements various utility functions such as parsing config file, data files, weights file.
+- model.cpp & model.h
+  Implements the deep neural network object as well as provides methods for training, testing, and inferencing the model.
+- main.cpp
+  This is the entry point of the program and handles all arguments passed to the program.
