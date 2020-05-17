@@ -7,25 +7,39 @@ void Config::readConfig(std::string configPath)
     std::ifstream filestream(configPath);
     if (filestream.is_open())
     {
-        while (std::getline(filestream, line))
+        while (!filestream.eof())
         {
-            std::istringstream linestream(line);
-            linestream >> value;
+            std::getline(filestream, line);
 
-            if (value.find("[") != std::string::npos)
+            if (line.find("[train]") != std::string::npos)
             {
-                LayerType layer = getLayerType(value);
-                layers.push_back(layer);
+                while (!filestream.eof())
+                {
+                    std::getline(filestream, line);
+                    if (line == "")
+                        break;
+
+                    std::vector<std::string> config = Utils::parseProperties(line);
+                    trainConfig[config[0]] = config[1];
+                }
             }
-            else if (line == "")
+            else if (line.find("[") != std::string::npos)
             {
+                LayerType layer = getLayerType(line);
+                layers.push_back(layer);
+
+                while (!filestream.eof())
+                {
+                    std::getline(filestream, line);
+                    if (line == "")
+                        break;
+
+                    std::vector<std::string> props = Utils::parseProperties(line);
+                    propertiesMap[props[0]] = props[1];
+                }
+
                 layerProperties.push_back(propertiesMap);
                 properties.clear();
-            }
-            else
-            {
-                std::vector<std::string> props = Utils::parseProperties(value);
-                propertiesMap[props[0]] = props[1];
             }
         }
         layerProperties.push_back(propertiesMap);
@@ -167,6 +181,13 @@ void Config::printConfig()
     std::map<LayerType, std::string> mapLayerType;
     mapLayerType[LayerType::dense] = "DenseLayer";
 
+    std::cout << "Training Configuration:" << std::endl;
+    for (auto config : trainConfig)
+    {
+        std::cout << "    " << config.first << " = " << config.second << std::endl;
+    }
+    std::cout << std::endl;
+
     for (int l = 0; l < layers.size(); l++)
     {
         std::cout << "Layer Type:\n    " << mapLayerType[layers[l]] << std::endl;
@@ -203,9 +224,9 @@ void Utils::plot(Eigen::MatrixXf *x, Eigen::MatrixXf *y)
             {
                 xVec.push_back((*x)(i, 0));
                 yVec.push_back((*x)(i, 1));
-                plt::scatter(xVec, yVec, 5, {{"c", colors[cat]}, {"marker", "o"}});
             }
         }
+        plt::scatter(xVec, yVec, 5, {{"c", colors[cat]}, {"marker", "o"}});
     }
     plt::show();
 }

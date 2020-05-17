@@ -19,7 +19,7 @@ class Model
 public:
     Model(Config config);
     float accuracy(Eigen::MatrixXf *yPred, Eigen::MatrixXf *yTrue);
-    Eigen::MatrixXf *getPredCategories(Eigen::MatrixXf *layerOutput);
+    Eigen::MatrixXf getPredCategories(Eigen::MatrixXf *layerOutput);
     void loadWeights(const std::string &weightsPath);
     void predictBatch();
     void predictSingle();
@@ -28,11 +28,12 @@ public:
     void predict(std::unique_ptr<Eigen::MatrixXf> testX);
     void saveWeights(const std::string &weightsPath);
     void test(std::unique_ptr<Eigen::MatrixXf> testX, std::unique_ptr<Eigen::MatrixXf> testY);
-    void testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY);
     void train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY);
     void trainSingle();
 
     int batchSize{1};
+    int trainEpochs{1};
+    std::string weightsPath;
 
 private:
     // Vector of pointers to neural network layers.

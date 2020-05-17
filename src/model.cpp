@@ -63,11 +63,13 @@ Model::Model(Config config)
 
     // CategoricalCrossEntropy _loss();
     // _optimizer = StochasticGradientDescent(0);
-    _optimizer.learningRate = 1;
+    _optimizer.learningRate = std::stoi(config.trainConfig["lr"]);
+    trainEpochs = std::stoi(config.trainConfig["epochs"]);
 }
 
-void Model::loadWeights(const std::string &weightsPath)
+void Model::loadWeights(const std::string &path)
 {
+    weightsPath = path;
     if (Utils::fileExists(weightsPath))
     {
         int cols = 0, rows = 0;
@@ -89,6 +91,9 @@ void Model::loadWeights(const std::string &weightsPath)
                     // std::cout << "shape: " << m.rows() << ", " << m.cols() << std::endl;
                     // std::cout << "layer: " << m.sum() << std::endl;
                     // std::cout << m << std::endl;
+                    // std::cout << "Layer In: "
+                    //           << "\n"
+                    //           << m << std::endl;
                     layer++;
                     pos = 0;
                     std::fill_n(buff, MAXBUFSIZE, 0);
@@ -106,6 +111,9 @@ void Model::loadWeights(const std::string &weightsPath)
             // std::cout << "shape: " << m.rows() << ", " << m.cols() << std::endl;
             // std::cout << "layer: " << m.sum() << std::endl;
             // std::cout << m << std::endl;
+            // std::cout << "Layer In: "
+            //           << "\n"
+            //           << m << std::endl;
         }
     }
 }
@@ -120,15 +128,17 @@ void Model::saveWeights(const std::string &weightsPath)
             Eigen::MatrixXf m = *(_layers[l]->_weights);
             file << "layer " << l << "\n"
                  << m << std::endl;
+            // std::cout << "Layer: " << l << "\n"
+            //           << m << std::endl;
         }
     }
 }
 
-Eigen::MatrixXf *Model::getPredCategories(Eigen::MatrixXf *layerOutput)
+Eigen::MatrixXf Model::getPredCategories(Eigen::MatrixXf *layerOutput)
 {
     Eigen::MatrixXf predictionScores = (*layerOutput).rowwise().maxCoeff();
-    Eigen::MatrixXf *predictionCategories = new Eigen::MatrixXf(predictionScores.rows(), predictionScores.cols());
-    *predictionCategories *= 0;
+    Eigen::MatrixXf predictionCategories = Eigen::MatrixXf::Zero(predictionScores.rows(), predictionScores.cols());
+    // predictionCategories *= 0;
 
     for (int i = 0; i < predictionScores.rows(); i++)
     {
@@ -136,7 +146,7 @@ Eigen::MatrixXf *Model::getPredCategories(Eigen::MatrixXf *layerOutput)
         {
             if ((*layerOutput)(i, cat) == predictionScores(i, 0))
             {
-                (*predictionCategories)(i, 0) = cat;
+                (predictionCategories)(i, 0) = cat;
             }
         }
     }
@@ -165,10 +175,11 @@ void Model::printModel()
 
 void Model::predict(std::unique_ptr<Eigen::MatrixXf> testX)
 {
-    std::cout << "*** Predict ***" << std::endl;
+    std::cout << "*** Model Predict ***\n"
+              << std::endl;
 
     Eigen::MatrixXf *layerOut;
-    Eigen::MatrixXf *yPred;
+    Eigen::MatrixXf yPred;
 
     layerOut = testX.get();
     for (int l = 0; l < _layers.size(); l++)
@@ -185,15 +196,16 @@ void Model::predict(std::unique_ptr<Eigen::MatrixXf> testX)
     yPred = getPredCategories(layerOut);
     std::cout << "Predictions:\n"
               << yPred << std::endl;
-    Utils::plot(testX.get(), yPred);
+    Utils::plot(testX.get(), &yPred);
 }
 
 void Model::test(std::unique_ptr<Eigen::MatrixXf> testX, std::unique_ptr<Eigen::MatrixXf> testY)
 {
-    std::cout << "*** Test ***" << std::endl;
+    std::cout << "*** Model Test ***\n"
+              << std::endl;
 
     Eigen::MatrixXf *layerOut;
-    Eigen::MatrixXf *yPred;
+    Eigen::MatrixXf yPred;
 
     layerOut = testX.get();
     for (int l = 0; l < _layers.size(); l++)
@@ -209,86 +221,19 @@ void Model::test(std::unique_ptr<Eigen::MatrixXf> testX, std::unique_ptr<Eigen::
 
     yPred = getPredCategories(layerOut);
 
-    std::cout << "Test Accuracy: " << accuracy(yPred, testY.get()) << "\n"
+    std::cout << "Test Accuracy: " << accuracy(&yPred, testY.get()) << "\n"
               << std::endl;
-    Utils::plot(testX.get(), yPred);
-}
-
-void Model::testForwardPass(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY)
-{
-    // std::cout << "*** Forward Pass Test ***" << std::endl;
-
-    // Eigen::MatrixXf layerOut = *trainX;
-
-    // for (int l = 0; l < _layers.size(); l++)
-    // {
-    //     Layer *layer = _layers[l];
-    //     layer->forward(layerOut);
-    //     layerOut = *(layer->_output);
-
-    //     Activation *activation = _activationLayers[l];
-    //     activation->forward(layerOut);
-    //     layerOut = *(activation->_output);
-    // }
-
-    // float loss = _loss.forward(layerOut, *trainY);
-    // std::cout << "Loss value: " << loss << "\n"
-    //           << std::endl;
-
-    // Eigen::MatrixXf yPred = getPredCategories(layerOut);
-
-    // std::cout << "final output: " << layerOut.rows() << ", " << layerOut.cols() << std::endl;
-    // std::cout << "predictions: " << yPred.rows() << ", " << yPred.cols() << "\n"
-    //           << std::endl;
-
-    // std::cout << "accuracy: " << accuracy(yPred, *trainY) << "\n"
-    //           << std::endl;
-
-    // _loss.backward(layerOut, *trainY);
-    // Eigen::MatrixXf backpassDeltaValues = *(_loss._backpassDeltaValues);
-    // std::cout << "loss backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
-    //           << std::endl;
-
-    // for (int l = _layers.size() - 1; l >= 0; l--)
-    // {
-    //     Activation *activation = _activationLayers[l];
-    //     activation->backward(backpassDeltaValues);
-    //     backpassDeltaValues = *(activation->_backpassDeltaValues);
-
-    //     Layer *layer = _layers[l];
-    //     layer->backward(backpassDeltaValues);
-    //     backpassDeltaValues = *(layer->_backpassDeltaValues);
-    // }
-
-    // std::cout << "final backward: " << backpassDeltaValues.rows() << ", " << backpassDeltaValues.cols() << "\n"
-    //           << std::endl;
-    // std::cout << "final backward: " << backpassDeltaValues << "\n"
-    //           << std::endl;
-
-    // for (int l = 0; l < _layers.size(); l++)
-    // {
-    //     // Update layer parameters using optimizer
-    //     Layer *layer = _layers[l];
-
-    //     std::cout << "weights before:\n"
-    //               << *((*layer)._weights) << "\n"
-    //               << std::endl;
-
-    //     _optimizer.updateParams(layer);
-
-    //     std::cout << "weights after:\n"
-    //               << *((*layer)._weights) << "\n"
-    //               << std::endl;
-    // }
+    Utils::plot(testX.get(), &yPred);
 }
 
 void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen::MatrixXf> trainY)
 {
-    std::cout << "*** Training ***" << std::endl;
+    std::cout << "*** Model Training ***\n"
+              << std::endl;
 
     Eigen::MatrixXf *layerOut;
-    Eigen::MatrixXf *yPred;
-    for (int iter = 0; iter < 10001; iter++)
+    Eigen::MatrixXf yPred;
+    for (int iter = 0; iter < trainEpochs; iter++)
     {
         layerOut = trainX.get();
         for (int l = 0; l < _layers.size(); l++)
@@ -310,9 +255,12 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
         yPred = getPredCategories(layerOut);
 
         if (iter % 100 == 0)
+        {
             std::cout << "Iteration: " << iter << ", Loss: " << loss << ", Accuracy: "
-                      << accuracy(yPred, trainY.get()) << "\n"
+                      << accuracy(&yPred, trainY.get()) << "\n"
                       << std::endl;
+            // saveWeights(weightsPath);
+        }
 
         _loss.backward(layerOut, trainY.get());
         // std::cout << "HERE" << std::endl;
@@ -337,9 +285,10 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
         }
     }
 
-    std::cout << "prediction - true:" << std::endl;
-    for (int i = 0; i < (*trainY).rows(); i++)
-    {
-        std::cout << (*yPred)(i, 0) << " - " << (*trainY)(i, 0) << std::endl;
-    }
+    // std::cout << "prediction - true:" << std::endl;
+    // for (int i = 0; i < (*trainY).rows(); i++)
+    // {
+    //     std::cout << (*yPred)(i, 0) << " - " << (*trainY)(i, 0) << std::endl;
+    // }
+    Utils::plot(trainX.get(), &yPred);
 }

@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     std::string mode, config, weights;
-    std::string xPath, yPath;
+    std::string xPath{""}, yPath{""};
     if (argc < 5)
     {
         std::cout << "Usage: [train/test/pred] [config path] [weights path] <option(s)>\n"
@@ -21,12 +21,7 @@ int main(int argc, char *argv[])
                   << "    <test X data path if mode is test>\n"
                   << "    <pred X data path if mode is pred>\n"
                   << std::endl;
-        // return 1;
-    }
-    std::cout << "Arguments:" << std::endl;
-    for (int i = 0; i < argc; i++)
-    {
-        std::cout << i << ": " << argv[i] << std::endl;
+        return 1;
     }
 
     mode = argv[1];
@@ -36,7 +31,8 @@ int main(int argc, char *argv[])
     {
         if (argc < 6)
         {
-            // return 1;
+            std::cout << "*** Insufficient arguments! ***" << std::endl;
+            return 1;
         }
         xPath = argv[4];
         yPath = argv[5];
@@ -49,25 +45,20 @@ int main(int argc, char *argv[])
     {
         std::cout << "Unsupported argument in position [1]: " << mode << std::endl;
     }
-    std::cout << "Arguments:" << std::endl;
-    for (int i = 0; i < argc; i++)
-    {
-        std::cout << argv[i] << std::endl;
-    }
 
     std::string configPath = "../config/l3.config";
 
-    if (!xPath.empty())
-        std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(xPath));
+    // if (!xPath.empty())
+    //     std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(xPath));
 
-    if (!yPath.empty())
-        std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(yPath));
-
+    // if (!yPath.empty())
+    //     std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(yPath));
     std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
     std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
 
     Config networkConfig;
     networkConfig.readConfig(configPath);
+    // networkConfig.printConfig();
 
     Model model = Model(networkConfig);
     model.printModel();
@@ -86,7 +77,6 @@ int main(int argc, char *argv[])
     {
         model.predict(std::move(xData));
     }
-    // model.testForwardPass(std::move(trainX), std::move(trainY));
 
     return 0;
 }

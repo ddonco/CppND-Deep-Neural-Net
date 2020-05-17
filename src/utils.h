@@ -27,6 +27,7 @@ public:
     std::vector<LayerType> layers;
     std::vector<std::map<std::string, std::string>> layerProperties;
     std::map<std::string, std::string> propertiesMap;
+    std::map<std::string, std::string> trainConfig;
 
 private:
 };
@@ -61,7 +62,7 @@ M readCsv(const std::string &path)
         }
         ++rows;
     }
-    return Eigen::Map<const Eigen::Matrix<typename M::Scalar, M::RowsAtCompileTime, M::ColsAtCompileTime>>(values.data(), rows, values.size() / rows);
+    return Eigen::Map<const Eigen::Matrix<typename M::Scalar, M::RowsAtCompileTime, M::ColsAtCompileTime, Eigen::RowMajor>>(values.data(), rows, values.size() / rows);
 }
 
 #endif
