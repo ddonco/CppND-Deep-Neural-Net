@@ -10,7 +10,6 @@ class Loss
 public:
     Loss();
 
-    // protected:
     std::unique_ptr<Eigen::MatrixXf> _backpassDeltaValues;
 };
 

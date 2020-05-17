@@ -61,8 +61,7 @@ Model::Model(Config config)
         }
     }
 
-    // CategoricalCrossEntropy _loss();
-    // _optimizer = StochasticGradientDescent(0);
+    CategoricalCrossEntropy _loss();
     _optimizer.learningRate = std::stoi(config.trainConfig["lr"]);
     trainEpochs = std::stoi(config.trainConfig["epochs"]);
 }
@@ -88,12 +87,6 @@ void Model::loadWeights(const std::string &path)
                 {
                     Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
                     *(_layers[layer]->_weights) = m;
-                    // std::cout << "shape: " << m.rows() << ", " << m.cols() << std::endl;
-                    // std::cout << "layer: " << m.sum() << std::endl;
-                    // std::cout << m << std::endl;
-                    // std::cout << "Layer In: "
-                    //           << "\n"
-                    //           << m << std::endl;
                     layer++;
                     pos = 0;
                     std::fill_n(buff, MAXBUFSIZE, 0);
@@ -108,12 +101,6 @@ void Model::loadWeights(const std::string &path)
             }
             Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
             *(_layers[layer]->_weights) = m;
-            // std::cout << "shape: " << m.rows() << ", " << m.cols() << std::endl;
-            // std::cout << "layer: " << m.sum() << std::endl;
-            // std::cout << m << std::endl;
-            // std::cout << "Layer In: "
-            //           << "\n"
-            //           << m << std::endl;
         }
     }
 }
@@ -128,8 +115,6 @@ void Model::saveWeights(const std::string &weightsPath)
             Eigen::MatrixXf m = *(_layers[l]->_weights);
             file << "layer " << l << "\n"
                  << m << std::endl;
-            // std::cout << "Layer: " << l << "\n"
-            //           << m << std::endl;
         }
     }
 }
@@ -248,9 +233,6 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
         }
 
         float loss = _loss.forward(layerOut, trainY.get());
-        // std::cout << "layer out: "
-        //           << (*layerOut).rows() << ", " << (*layerOut).cols() << "\n"
-        //           << std::endl;
 
         yPred = getPredCategories(layerOut);
 
@@ -259,11 +241,10 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
             std::cout << "Iteration: " << iter << ", Loss: " << loss << ", Accuracy: "
                       << accuracy(&yPred, trainY.get()) << "\n"
                       << std::endl;
-            // saveWeights(weightsPath);
+            saveWeights(weightsPath);
         }
 
         _loss.backward(layerOut, trainY.get());
-        // std::cout << "HERE" << std::endl;
         Eigen::MatrixXf *backpassDeltaValues = _loss._backpassDeltaValues.get();
 
         for (int l = _layers.size() - 1; l >= 0; l--)
@@ -285,10 +266,5 @@ void Model::train(std::unique_ptr<Eigen::MatrixXf> trainX, std::unique_ptr<Eigen
         }
     }
 
-    // std::cout << "prediction - true:" << std::endl;
-    // for (int i = 0; i < (*trainY).rows(); i++)
-    // {
-    //     std::cout << (*yPred)(i, 0) << " - " << (*trainY)(i, 0) << std::endl;
-    // }
     Utils::plot(trainX.get(), &yPred);
 }

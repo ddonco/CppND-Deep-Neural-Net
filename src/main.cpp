@@ -9,6 +9,9 @@ int main(int argc, char *argv[])
 {
     std::string mode, config, weights;
     std::string xPath{""}, yPath{""};
+    std::unique_ptr<Eigen::MatrixXf> xData;
+    std::unique_ptr<Eigen::MatrixXf> yData;
+
     if (argc < 5)
     {
         std::cout << "Usage: [train/test/pred] [config path] [weights path] <option(s)>\n"
@@ -46,18 +49,14 @@ int main(int argc, char *argv[])
         std::cout << "Unsupported argument in position [1]: " << mode << std::endl;
     }
 
-    std::string configPath = "../config/l3.config";
+    if (!xPath.empty())
+        xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(xPath));
 
-    // if (!xPath.empty())
-    //     std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(xPath));
-
-    // if (!yPath.empty())
-    //     std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(yPath));
-    std::unique_ptr<Eigen::MatrixXf> xData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/X.csv"));
-    std::unique_ptr<Eigen::MatrixXf> yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>("../data/Y.csv"));
+    if (!yPath.empty())
+        yData = std::make_unique<Eigen::MatrixXf>(readCsv<Eigen::MatrixXf>(yPath));
 
     Config networkConfig;
-    networkConfig.readConfig(configPath);
+    networkConfig.readConfig(config);
     // networkConfig.printConfig();
 
     Model model = Model(networkConfig);

@@ -67,16 +67,16 @@ A complete prediction command is as follows:
 A bief overview of the project sorce code.
 
 - activation.cpp & activation.h
-  Implements the ReLU and Softmax activation functions of the neural network.
+  - Implements the ReLU and Softmax activation functions of the neural network.
 - layer.cpp & layer.h
-  Implements the Dense layer of the neural network.
+  - Implements the Dense layer of the neural network.
 - loss.cpp & loss.h
-  Implements the Categorical Cross-Entropy loss function of the neural network.
+  - Implements the Categorical Cross-Entropy loss function of the neural network.
 - optimizer.cpp & optimizer.h
-  Implements the Stocastic Gradient Descent optimizer function of the neural network.
+  - Implements the Stocastic Gradient Descent optimizer function of the neural network.
 - utils.cpp & utils.h
-  Implements various utility functions such as parsing config file, data files, weights file.
+  - Implements various utility functions such as parsing config file, data files, weights file.
 - model.cpp & model.h
-  Implements the deep neural network object as well as provides methods for training, testing, and inferencing the model.
+  - Implements the deep neural network object as well as provides methods for training, testing, and inferencing the model.
 - main.cpp
-  This is the entry point of the program and handles all arguments passed to the program.
+  - This is the entry point of the program and handles all arguments passed to the program.

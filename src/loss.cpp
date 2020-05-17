@@ -23,12 +23,9 @@ float CategoricalCrossEntropy::forward(Eigen::MatrixXf *yPred, Eigen::MatrixXf *
         }
         yPrediction = yPredArray;
     }
-    // std::cout << "ypred:\n"
-    //           << yPred << std::endl;
 
     // Calculate losses
     Eigen::MatrixXf negLogLikelihoods = yPrediction.array().log() * -1;
-    // negLogLikelihoods = negLogLikelihoods * -1;
 
     // For on-hot-encoded labels, mask labels with likelihoods
     if ((*yTrue).cols() == 2)
@@ -47,15 +44,10 @@ void CategoricalCrossEntropy::backward(Eigen::MatrixXf *values, Eigen::MatrixXf 
     int yTrueCat = 0;
     *_backpassDeltaValues = *values;
 
-    // std::cout << "loss backpass values in: "
-    //           << (*_backpassDeltaValues).rows() << ", " << (*_backpassDeltaValues).cols() << std::endl;
-
     for (int r = 0; r < numSamples; r++)
     {
         yTrueCat = (*yTrue)(r, 0);
         (*_backpassDeltaValues)(r, yTrueCat) -= 1;
     }
     *_backpassDeltaValues /= (float)numSamples;
-    // std::cout << "loss backpass values out:\n"
-    //           << *_backpassDeltaValues << std::endl;
 }

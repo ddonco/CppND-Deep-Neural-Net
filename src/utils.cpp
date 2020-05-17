@@ -90,7 +90,6 @@ Eigen::MatrixXf Utils::loadMatrix(const std::string &filePath)
 
     // // Read numbers from file into buffer.
     std::ifstream filestream(filePath);
-    // // file.open(filePath);
     if (filestream.is_open())
     {
         std::string line, token;
@@ -120,7 +119,6 @@ Eigen::MatrixXf Utils::loadMatrix(const std::string &filePath)
                     cols = temp_cols;
 
                 rows++;
-                // std::cout << buff << std::endl;
             }
         }
     }
