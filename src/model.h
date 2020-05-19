@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <mutex>
-#include <variant>
 #include <Eigen/Dense>
 
 #include "activation.h"
