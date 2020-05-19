@@ -25,7 +25,7 @@ This capstone project implements a simple deep neural network for training and i
 1. Clone this repo.
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
-4. Run it: `./DNN train ../config/l3.config ../data/test_5-12.weights ../data/X.csv ../data/Y.csv`
+4. Run it: `./DNN train ../config/l3.config ../data/test.weights ../data/X.csv ../data/Y.csv`
 
 ## Usage
 
@@ -46,21 +46,21 @@ A model weights path must be specified when training to provide a destination fo
 Finally, training data paths must be passed to the model in the form of a features file and a labels file. Sample training data can be found in the `data` folder with `X.csv` being the features data and `Y.csv` being the labels data.
 
 A complete training command is as follows:
-`./DNN train ../config/l3.config ../data/test_5-12.weights ../data/X.csv ../data/Y.csv`
+`./DNN train ../config/l3.config ../data/test.weights ../data/X.csv ../data/Y.csv`
 
 ### Testing
 
 Testing can be run on the deep neural network model to determine if training has been successful and the model has learned the desired relationships between features and labels. Testing should be done using data that wasn't passed to the model during training, but comes from the same larger dataset that produced the training data.
 
 A complete testing command is as follows:
-`./DNN test ../config/l3.config ../data/test_5-12.weights ../data/X.csv ../data/Y.csv`
+`./DNN test ../config/l3.config ../data/test_5-18.weights ../data/X.csv ../data/Y.csv`
 
 ### Inferencing
 
 Finally, a trained model can be used for inferencing, which is essentially predicting the label(s) of a given set of feature data. For predicting, only feature data is passed to the model.
 
 A complete prediction command is as follows:
-`./DNN pred ../config/l3.config ../data/test_5-12.weights ../data/X.csv`
+`./DNN pred ../config/l3.config ../data/test_5-18.weights ../data/X.csv`
 
 ## Source Code
 

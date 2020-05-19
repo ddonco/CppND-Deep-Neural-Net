@@ -83,24 +83,50 @@ void Model::loadWeights(const std::string &path)
             Eigen::MatrixXf *weights;
             while (std::getline(filestream, line))
             {
-                if (line.find("layer") != std::string::npos && pos > 0)
+                if (line.find("layer") != std::string::npos)
                 {
-                    Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
-                    *(_layers[layer]->_weights) = m;
-                    layer++;
-                    pos = 0;
-                    std::fill_n(buff, MAXBUFSIZE, 0);
+                    while (std::getline(filestream, line))
+                    {
+                        if (line == "")
+                        {
+                            Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
+                            *(_layers[layer]->_weights) = m;
+                            pos = 0;
+                            std::fill_n(buff, MAXBUFSIZE, 0);
+                            break;
+                        }
+
+                        std::istringstream linestream(line);
+
+                        while (linestream >> buff[pos])
+                        {
+                            pos++;
+                        }
+                    }
                 }
-
-                std::istringstream linestream(line);
-
-                while (linestream >> buff[pos])
+                if (line.find("bias") != std::string::npos)
                 {
-                    pos++;
+                    while (std::getline(filestream, line))
+                    {
+                        if (line == "")
+                        {
+                            Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_bias)).rows(), (*(_layers[layer]->_bias)).cols());
+                            *(_layers[layer]->_bias) = m;
+                            layer++;
+                            pos = 0;
+                            std::fill_n(buff, MAXBUFSIZE, 0);
+                            break;
+                        }
+
+                        std::istringstream linestream(line);
+
+                        while (linestream >> buff[pos])
+                        {
+                            pos++;
+                        }
+                    }
                 }
             }
-            Eigen::MatrixXf m = Utils::bufferToMatrix(buff, (*(_layers[layer]->_weights)).rows(), (*(_layers[layer]->_weights)).cols());
-            *(_layers[layer]->_weights) = m;
         }
     }
 }
@@ -114,7 +140,13 @@ void Model::saveWeights(const std::string &weightsPath)
         {
             Eigen::MatrixXf m = *(_layers[l]->_weights);
             file << "layer " << l << "\n"
-                 << m << std::endl;
+                 << m << "\n"
+                 << std::endl;
+
+            m = *(_layers[l]->_bias);
+            file << "bias " << l << "\n"
+                 << m << "\n"
+                 << std::endl;
         }
     }
 }
