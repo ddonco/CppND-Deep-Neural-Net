@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CXX_FLAGS "-Wall") # -march=native -fopenmp")
 set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
-set(Eigen3_DIR, "../../eigen-3.3.7/cmake/")
 
 project(DNN)
 
