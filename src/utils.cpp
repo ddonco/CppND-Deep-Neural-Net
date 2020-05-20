@@ -224,7 +224,7 @@ void Utils::plot(Eigen::MatrixXf *x, Eigen::MatrixXf *y)
                 yVec.push_back((*x)(i, 1));
             }
         }
-        plt::scatter(xVec, yVec, 5, {{"c", colors[cat]}, {"marker", "o"}});
+        plt::scatter(xVec, yVec, 10, {{"c", colors[cat]}, {"marker", "o"}});
     }
     plt::show();
 }

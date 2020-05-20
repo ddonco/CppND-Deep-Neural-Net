@@ -15,7 +15,11 @@ This capstone project implements a simple deep neural network for training and i
   - Mac: same deal as make - [install Xcode command line tools](https://developer.apple.com/xcode/features/)
   - Windows: recommend using [MinGW](http://www.mingw.org/)
 - eigen >= 3.3.7
-  - Download and extract eigen source code [https://eigen.tuxfamily.org/dox/GettingStarted.html]
+  1. `git clone https://gitlab.com/libeigen/eigen.git` to workspace
+  2. `cd eigen`
+  3. `mkdir build && cd build`
+  4. `cmake ..`
+  5. `make install`
 - matplotlib-cpp
   - C++ wrapper is already included in project source but can also be cloned from github [https://github.com/lava/matplotlib-cpp]
   - requirements for matplotlib-cpp can be satisfied by running: `sudo apt-get install python-matplotlib python-numpy python2.7-dev`
