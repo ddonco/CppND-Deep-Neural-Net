@@ -178,7 +178,6 @@ void Config::printConfig()
 {
     std::map<LayerType, std::string> mapLayerType;
     mapLayerType[LayerType::dense] = "DenseLayer";
-    std::string key, value;
 
     std::cout << "Training Configuration:" << std::endl;
     for (auto config : trainConfig)
@@ -194,9 +193,9 @@ void Config::printConfig()
         std::cout << "Layer Properties:" << std::endl;
 
         std::map<std::string, std::string> properties = layerProperties[l];
-        for (auto const &[key, value] : properties)
+        for (const auto &value : properties)
         {
-            std::cout << "    " << key << " = " << value << std::endl;
+            std::cout << "    " << value.first << " = " << value.second << std::endl;
         }
         std::cout << std::endl;
     }
