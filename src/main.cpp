@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     networkConfig.readConfig(config);
     // networkConfig.printConfig();
 
-    Model model = Model(networkConfig);
+    Model model(networkConfig);
     model.printModel();
     model.loadWeights(weights);
 
