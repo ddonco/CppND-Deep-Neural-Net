@@ -19,10 +19,18 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
+
 # Find Matplotlib
-find_package(Python3 COMPONENTS Development NumPy)
-target_include_directories(DNN PRIVATE ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
-target_link_libraries(DNN Python3::Python Python3::NumPy)
+set(USE_PYTHON3 False)
+if(USE_PYTHON3)
+    find_package(Python3 COMPONENTS Development NumPy)
+    target_include_directories(DNN PRIVATE ${Python3_INCLUDE_DIRS} ${Python3_NumPy_INCLUDE_DIRS})
+    target_link_libraries(DNN Python3::Python Python3::NumPy)
+else()
+    find_package(PythonLibs 2.7)
+    target_include_directories(myproject PRIVATE ${PYTHON_INCLUDE_DIRS})
+    target_link_libraries(myproject ${PYTHON_LIBRARIES})
+endif()
 
 message("${CMAKE_CURRENT_LIST_DIR}")
 message("${CMAKE_MODULE_PATH}")
