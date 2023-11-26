@@ -1,6 +1,6 @@
 # CPPND: Capstone - Deep Neural Netowork
 
-This capstone project implements a simple deep neural network for training and inferencing on tabular data. A user defined network of fully connected layers can be trained using stochastic gradient descent as the optimizer and categorical cross-entropy as the loss function. This project serves as an exercise to both solidify a multitude of concepts regarding programming in C++ as well as gain a deeper understanding of the mechanics within deep neural networks.
+This capstone project implements a multilayer perceptron network (a simple deep neural network) for training and inferencing on tabular data. A user defined network of fully connected layers can be trained using stochastic gradient descent as the optimizer and categorical cross-entropy as the loss function. This project serves as an exercise to both solidify a multitude of concepts regarding programming in C++ as well as gain a deeper understanding of the mechanics within deep neural networks.
 
 ## Dependencies for Running Locally
 
@@ -35,7 +35,7 @@ This capstone project implements a simple deep neural network for training and i
 
 ### Training
 
-Like any machine learning model, a deep neural network must first be trained before it can be useful. A config file must be defined to build the neural network. A sample config file can be found in the `config` folder. The number of training epochs and learning rate are set at the top of the file under `[train]`. The model configuration is specified below the training parameters.
+Like any machine learning model, a deep neural network must first be trained before it can be useful. A config file must be defined to build the neural network. A sample config file can be found in the `config` folder. This sample configuration implements a 3 layer dense network with relu activation applied to the input and hidden layer, and softmax activation at the output layer. Note: when building network layers, the number of output nodes from one layer must match the number of input nodes into the next layer. The number of training epochs and learning rate are set at the top of the file under `[train]`. The model configuration is specified below the training parameters.
 
 At this time the supported layer and activation types are:
 
